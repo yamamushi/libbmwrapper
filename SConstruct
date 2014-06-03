@@ -15,7 +15,7 @@ env.Append(CPPPATH = ['/usr/local/include/','src','src/crypto','src/jsoncpp','sr
 env.Append(LIBPATH = ['/usr/local/lib/'])
 env.Append(LIBS = ['xmlrpc_client++','boost_system'])
 #env.Append(CXXFLAGS = ['-std=c++11','-stdlib=libc++'])
-env.Append(CXXFLAGS = ['-std=c++11'])
+env.Append(CXXFLAGS = ['-std=c++11','-fPIC'])
 
 
 sources = Split("""

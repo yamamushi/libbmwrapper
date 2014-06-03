@@ -8,6 +8,26 @@
 //
 
 #ifndef OT_USE_TR1
+#ifdef __linux__
+#include <chrono>
+#include <tr1/memory>
+#include <condition_variable>
+#include <functional>
+#include <atomic>
+#include <thread>
+#define OT_THREAD std::thread
+#define OT_MUTEX(MT) std::mutex MT
+#define INSTANTIATE_MLOCK(MT) std::unique_lock<std::mutex>mlock(MT)
+#define CONDITION_VARIABLE(VAR) std::condition_variable VAR
+#define OT_ATOMIC(THE_ATOM) std::atomic<bool> THE_ATOM
+#define OT_ATOMIC_TRUE true
+#define OT_ATOMIC_FALSE false
+#define OT_ATOMIC_ISTRUE(THE_VAL) (true == THE_VAL)
+#define OT_ATOMIC_ISFALSE(THE_VAL) (false == THE_VAL)
+#define OT_STD_FUNCTION(FUNC_TYPE) std::function< FUNC_TYPE >
+#define OT_STD_BIND std::bind
+#else
+#ifdef __APPLE__
 #include <chrono>
 #include <thread>
 #include <mutex>
@@ -43,5 +63,7 @@
 #define OT_STD_BIND std::tr1::bind
 #ifndef nullptr
 #define nullptr NULL
+#endif
+#endif
 #endif
 #endif
