@@ -19,3 +19,9 @@
 *.exe
 *.out
 *.app
+
+# Scons DB
+.sconsign.dblite
+
+# Mac Files
+.DS_Store
