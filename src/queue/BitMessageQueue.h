@@ -3,6 +3,7 @@
 //  BitMessageQueue.h
 //
 #include "BitMessage.h"
+#include "MsgQueue.h"
 
 //#include <mutex>
 //#include <condition_variable>

@@ -7,12 +7,11 @@
 #include <string>
 #include <ctime>
 #include "Network.h"
-#include "XmlRPC.h"
-#include "base64.h"
-#include "MsgQueue.h"
-#include "BitMessageQueue.h"
 #include "TR1_Wrapper.hpp"
-
+#include "Threading.h"
+#include "base64.h"
+#include "XmlRPC.h"
+#include "BitMessageQueue.h"
 
 typedef std::string BitMessageAddress;
 

@@ -22,7 +22,7 @@ sources = Split("""
 src/jsoncpp/jsoncpp.cpp
 src/queue/BitMessageQueue.cpp
 src/network/Network.cpp
-src/network/BitMessage.cpp
+src/BitMessage.cpp
 src/network/XmlRPC.cpp
 src/crypto/base64.cpp
 """)
