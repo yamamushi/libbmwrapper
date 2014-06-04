@@ -37,6 +37,6 @@ staticbmwrapper = env.StaticLibrary('bmwrapper', source = object_list)
 
 # Installation Target
 
-# env.Install("/usr/local/lib/", '')
-# env.Alias('install', ['/usr/local/bin'])
+env.Install("/usr/local/lib/")
+env.Alias('install', ['/usr/local/lib/'])
 
