@@ -3,7 +3,7 @@
 //
 
 #include "BitMessage.h"
-#include "json/json.h"
+#include <json/json.h>
 
 
 #include <string>
@@ -605,7 +605,7 @@ void BitMessage::getAllInboxMessages(){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse inbox\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse inbox\n" << reader.getFormatedErrorMessages();
     }
     
     const Json::Value inboxMessages = root["inboxMessages"];
@@ -670,19 +670,19 @@ void BitMessage::getInboxMessageByID(std::string msgID, bool setRead){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse inbox\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse inbox\n" << reader.getFormatedErrorMessages();
         BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
         //return message;
     }
     
     const Json::Value inboxMessage = root["inboxMessage"];
     
-    std::string dirtyMessage = inboxMessage[0].get("message", "").asString();
+    std::string dirtyMessage = inboxMessage[0u].get("message", "").asString();
     dirtyMessage.erase(std::remove(dirtyMessage.begin(), dirtyMessage.end(), '\n'), dirtyMessage.end());
     base64 cleanMessage(dirtyMessage, true);
     
     
-    BitInboxMessage message(inboxMessage[0].get("msgid", "").asString(), inboxMessage[0].get("toAddress", "").asString(), inboxMessage[0].get("fromAddress", "").asString(), base64(inboxMessage[0].get("subject", "").asString(), true), cleanMessage, inboxMessage[0].get("encodingType", 0).asInt(), std::atoi(inboxMessage[0].get("receivedTime", 0).asString().c_str()), inboxMessage[0].get("read", false).asBool());
+    BitInboxMessage message(inboxMessage[0u].get("msgid", "").asString(), inboxMessage[0u].get("toAddress", "").asString(), inboxMessage[0u].get("fromAddress", "").asString(), base64(inboxMessage[0u].get("subject", "").asString(), true), cleanMessage, inboxMessage[0u].get("encodingType", 0).asInt(), std::atoi(inboxMessage[0u].get("receivedTime", 0).asString().c_str()), inboxMessage[0u].get("read", false).asBool());
     
     //return message;
     
@@ -714,7 +714,7 @@ void BitMessage::getAllSentMessages(){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse outbox\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse outbox\n" << reader.getFormatedErrorMessages();
     }
     
     INSTANTIATE_MLOCK(m_localOutboxMutex);
@@ -782,18 +782,18 @@ BitSentMessage BitMessage::getSentMessageByID(std::string msgID){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse outbox\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse outbox\n" << reader.getFormatedErrorMessages();
         return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
     }
     
     const Json::Value sentMessage = root["sentMessage"];
     
-    std::string dirtyMessage = sentMessage[0].get("message", "").asString();
+    std::string dirtyMessage = sentMessage[0u].get("message", "").asString();
     dirtyMessage.erase(std::remove(dirtyMessage.begin(), dirtyMessage.end(), '\n'), dirtyMessage.end());
     base64 cleanMessage(dirtyMessage, true);
     
     
-    BitSentMessage message(sentMessage[0].get("msgid", "").asString(), sentMessage[0].get("toAddress", "").asString(), sentMessage[0].get("fromAddress", "").asString(), base64(sentMessage[0].get("subject", "").asString(), true), cleanMessage, sentMessage[0].get("encodingType", 0).asInt(), sentMessage[0].get("lastActionTime", 0).asInt(), sentMessage[0].get("status", false).asString(), sentMessage[0].get("ackData", false).asString());
+    BitSentMessage message(sentMessage[0u].get("msgid", "").asString(), sentMessage[0u].get("toAddress", "").asString(), sentMessage[0u].get("fromAddress", "").asString(), base64(sentMessage[0u].get("subject", "").asString(), true), cleanMessage, sentMessage[0u].get("encodingType", 0).asInt(), sentMessage[0u].get("lastActionTime", 0).asInt(), sentMessage[0u].get("status", false).asString(), sentMessage[0u].get("ackData", false).asString());
     
     return message;
     
@@ -828,18 +828,18 @@ BitSentMessage BitMessage::getSentMessageByAckData(std::string ackData){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse outbox\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse outbox\n" << reader.getFormatedErrorMessages();
         return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
     }
     
     const Json::Value sentMessage = root["sentMessage"];
     
-    std::string dirtyMessage = sentMessage[0].get("message", "").asString();
+    std::string dirtyMessage = sentMessage[0u].get("message", "").asString();
     dirtyMessage.erase(std::remove(dirtyMessage.begin(), dirtyMessage.end(), '\n'), dirtyMessage.end());
     base64 cleanMessage(dirtyMessage, true);
     
     
-    BitSentMessage message(sentMessage[0].get("msgid", "").asString(), sentMessage[0].get("toAddress", "").asString(), sentMessage[0].get("fromAddress", "").asString(), base64(sentMessage[0].get("subject", "").asString(), true), cleanMessage, sentMessage[0].get("encodingType", 0).asInt(), sentMessage[0].get("lastActionTime", 0).asInt(), sentMessage[0].get("status", false).asString(), sentMessage[0].get("ackData", false).asString());
+    BitSentMessage message(sentMessage[0u].get("msgid", "").asString(), sentMessage[0u].get("toAddress", "").asString(), sentMessage[0u].get("fromAddress", "").asString(), base64(sentMessage[0u].get("subject", "").asString(), true), cleanMessage, sentMessage[0u].get("encodingType", 0).asInt(), sentMessage[0u].get("lastActionTime", 0).asInt(), sentMessage[0u].get("status", false).asString(), sentMessage[0u].get("ackData", false).asString());
     
     return message;
     
@@ -1031,7 +1031,7 @@ void BitMessage::listSubscriptions(){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse subscription list\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse subscription list\n" << reader.getFormatedErrorMessages();
         //return subscriptionList;
     }
     
@@ -1214,7 +1214,7 @@ void BitMessage::listAddresses(){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr << "Failed to parse configuration\n" << reader.getFormattedErrorMessages();
+        std::cerr << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
     }
     
     const Json::Value addresses = root["addresses"];
@@ -1298,7 +1298,7 @@ void BitMessage::createDeterministicAddresses(base64 password, int numberOfAddre
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse address list\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse address list\n" << reader.getFormatedErrorMessages();
         //return addressList;
     }
     
@@ -1369,7 +1369,7 @@ void BitMessage::listAddressBookEntries(){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse address list\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse address list\n" << reader.getFormatedErrorMessages();
     }
     
     const Json::Value addresses = root["addresses"];
@@ -1500,7 +1500,7 @@ BitDecodedAddress BitMessage::decodeAddress(std::string address){
     bool parsesuccess = reader.parse( ValueString(result.second), root );
     if ( !parsesuccess )
     {
-        std::cerr  << "Failed to parse configuration\n" << reader.getFormattedErrorMessages();
+        std::cerr  << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
         return BitDecodedAddress("", 0, "", 0);
     }
     
