@@ -20,8 +20,22 @@
 *.out
 *.app
 
-# Scons DB
-.sconsign.dblite
+# autotools
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+config.h
+config.h.in
+config.h.in~
+config.log
+config.status
+configure
+libtool
+src/.deps/
+src/Makefile
+src/Makefile.in
+stamp-h1
 
 # Mac Files
 .DS_Store
