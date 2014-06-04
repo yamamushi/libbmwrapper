@@ -8,6 +8,7 @@
 //
 
 #ifndef OT_USE_TR1
+
 #ifdef __linux__
 #include <chrono>
 #include <tr1/memory>
@@ -26,7 +27,8 @@
 #define OT_ATOMIC_ISFALSE(THE_VAL) (false == THE_VAL)
 #define OT_STD_FUNCTION(FUNC_TYPE) std::function< FUNC_TYPE >
 #define OT_STD_BIND std::bind
-#else
+#endif
+
 #ifdef __APPLE__
 #include <chrono>
 #include <thread>
@@ -44,6 +46,8 @@
 #define OT_ATOMIC_ISFALSE(THE_VAL) (false == THE_VAL)
 #define OT_STD_FUNCTION(FUNC_TYPE) std::function< FUNC_TYPE >
 #define OT_STD_BIND std::bind
+#endif
+
 #else
 #include <boost/chrono.hpp>
 #include <boost/thread.hpp>
@@ -63,7 +67,5 @@
 #define OT_STD_BIND std::tr1::bind
 #ifndef nullptr
 #define nullptr NULL
-#endif
-#endif
 #endif
 #endif
