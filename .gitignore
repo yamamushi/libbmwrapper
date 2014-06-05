@@ -32,12 +32,23 @@ config.log
 config.status
 configure
 libtool
-build-aux/
 src/.libs/
 src/.deps/
 src/Makefile
 src/Makefile.in
 stamp-h1
+build-aux/compile
+build-aux/config.guess
+build-aux/config.sub
+build-aux/depcomp
+build-aux/install-sh
+build-aux/ltmain.sh
+build-aux/m4/libtool.m4
+build-aux/m4/ltoptions.m4
+build-aux/m4/ltsugar.m4
+build-aux/m4/ltversion.m4
+build-aux/m4/lt~obsolete.m4
+build-aux/missing
 
 # Mac Files
 .DS_Store

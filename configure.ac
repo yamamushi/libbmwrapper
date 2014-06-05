@@ -1,7 +1,7 @@
 #  
 #
 AC_PREREQ([2.61])
-AC_INIT([libbmwrapper],m4_esyscmd(tr -d '\n' <VERSION), [info@monetas.net],[libbmwrapper],[http://opentransactions.org])
+AC_INIT([libbmwrapper],m4_esyscmd(tr -d '\n' <VERSION), [info@monetas.net],[libbmwrapper],[http://monetas.net])
 AC_CONFIG_SRCDIR([src/BitMessage.h])
 AC_CONFIG_HEADERS([config.h])
 
@@ -239,9 +239,16 @@ fi
 
 #####   Output to AM   #####
 
+# jsoncpp workaround as the libs are named differently on linux and osx
+if test `uname` == "Linux"; then
+	AC_SUBST([JSONCPP_LINK], ["-ljsoncpp"])
+else
+	AC_SUBST([JSONCPP_LINK], ["-ljson"])
+fi
+
 ##AC_SUBST([DEPS_CFLAGS],	[])
 
-##AC_SUBST([DEPS_LIBS],	[])
+AC_SUBST([BM_DEPS_LINK], ["-lxmlrpc_client++ -lxmlrpc++ -lxmlrpc -lboost_system -lboost_program_options $JSONCPP_LINK"])
 
 AC_SUBST([AM_CXXFLAGS],	["$DBG_CXXFLAGS $REL_CXXFLAGS $WARN_CXXFLAGS $CXX11_FLAGS $DEPS_CFLAGS"])
 
