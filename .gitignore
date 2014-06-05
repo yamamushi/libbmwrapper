@@ -32,6 +32,8 @@ config.log
 config.status
 configure
 libtool
+build-aux/
+src/.libs/
 src/.deps/
 src/Makefile
 src/Makefile.in
