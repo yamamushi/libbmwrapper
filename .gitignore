@@ -32,11 +32,8 @@ config.log
 config.status
 configure
 libtool
-<<<<<<< HEAD
 build-aux/
 src/.libs/
-=======
->>>>>>> db20b1ad09757ee6b79c2328a826e34f94f017fc
 src/.deps/
 src/Makefile
 src/Makefile.in
