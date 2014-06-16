@@ -1,3 +1,5 @@
+build
+
 # Compiled Object files
 *.slo
 *.lo
@@ -20,55 +22,6 @@
 *.out
 *.app
 
-# autotools
-Makefile
-Makefile.in
-aclocal.m4
-autom4te.cache/
-config.h
-config.h.in
-config.h.in~
-config.log
-config.status
-configure
-libtool
-src/.libs/
-src/.deps/
-src/Makefile
-src/Makefile.in
-stamp-h1
-build-aux/compile
-build-aux/config.guess
-build-aux/config.sub
-build-aux/depcomp
-build-aux/install-sh
-build-aux/ltmain.sh
-build-aux/m4/libtool.m4
-build-aux/m4/ltoptions.m4
-build-aux/m4/ltsugar.m4
-build-aux/m4/ltversion.m4
-build-aux/m4/lt~obsolete.m4
-build-aux/missing
-
-### Xcode ###
-build/
-*.pbxproj
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-xcuserdata
-*.xccheckout
-*.moved-aside
-DerivedData
-*.xcuserstate
-*.xcodeproj
-
-### OSX ###
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -90,6 +43,3 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-
-# Google Test Suite
-gtest/
