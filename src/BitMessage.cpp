@@ -345,7 +345,7 @@ std::vector<_SharedPtr<NetworkMail> > BitMessage::getOutbox(std::string address)
         if(address != ""){
             std::vector<_SharedPtr<NetworkMail> > outboxForAddress;
             for(int x=0; x<m_localOutbox.size(); x++){
-                if(m_localOutbox.at(x)->getTo() == address)
+                if(m_localOutbox.at(x)->getFrom() == address)
                     outboxForAddress.push_back(m_localOutbox.at(x));
             }
             mlock.unlock();
@@ -730,7 +730,8 @@ void BitMessage::getAllSentMessages(){
         base64 cleanMessage(dirtyMessage, true);
         
         BitSentMessage message(sentMessages[index].get("msgid", "").asString(), sentMessages[index].get("toAddress", "").asString(), sentMessages[index].get("fromAddress", "").asString(), base64(sentMessages[index].get("subject", "").asString(), true), cleanMessage, sentMessages[index].get("encodingType", 0).asInt(), sentMessages[index].get("lastActionTime", 0).asInt(), sentMessages[index].get("status", false).asString(), sentMessages[index].get("ackData", false).asString());
-                
+//        std::cout << "Time read: " << message.getLastActionTime() << std::endl;
+        
         m_localUnformattedOutbox.push_back(message);
         
         // Get read status from status
@@ -743,7 +744,7 @@ void BitMessage::getAllSentMessages(){
         }
         
         _SharedPtr<NetworkMail> outMessage(new NetworkMail(message.getFromAddress(), message.getToAddress(), message.getSubject().decoded(), message.getMessage().decoded(), received, message.getMessageID(), 0, message.getLastActionTime()));
-        
+//        std::cout << "Time read: " << outMessage->getSentTime() << std::endl;
         m_localOutbox.push_back(outMessage);
         
     }
