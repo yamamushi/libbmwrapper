@@ -13,6 +13,10 @@
 #include "XmlRPC.h"
 #include "BitMessageQueue.h"
 
+
+namespace bmwrapper{
+    
+
 typedef std::string BitMessageAddress;
 
 class BitMessageIdentity {
@@ -37,7 +41,7 @@ private:
     bool m_chan;
     
 };
-
+    
 typedef std::vector<BitMessageIdentity> BitMessageIdentities;
 
 
@@ -178,7 +182,7 @@ public:
     BitMessage(std::string commstring);
     ~BitMessage();
     
-    void forceKill(bool kill){m_forceKill = kill;};
+    void forceKill(bool kill){m_forceKill = kill;}
     
     // Virtual Function Implementations
     bool accessible();
@@ -211,7 +215,7 @@ public:
     
     bool sendMail(NetworkMail message); // Queued
     
-    bool publishSupport(){return true;};
+    bool publishSupport(){return true;}
     std::vector<std::pair<std::string,std::string> > getSubscriptions();
     bool refreshSubscriptions();
     
@@ -386,6 +390,7 @@ private:
 };
 
 
+}
 
 
 

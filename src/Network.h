@@ -64,7 +64,7 @@ public:
     std::string getMessage(){return m_mail;}
     std::time_t getReceivedTime(){return m_received;}
     std::time_t getSentTime(){return m_sent;}
-    void        setRead(bool status){m_readStatus = status;};
+    void        setRead(bool status){m_readStatus = status;}
     bool        getRead(){ return m_readStatus;}
     std::string getMessageID(){return m_messageID;}
     

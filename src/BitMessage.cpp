@@ -24,6 +24,8 @@
 
 #include<boost/tokenizer.hpp>
 
+namespace bmwrapper {
+
 
 BitMessage::BitMessage(std::string commstring) : NetworkModule(commstring) {
     
@@ -636,7 +638,7 @@ void BitMessage::getAllInboxMessages(){
     std::reverse(m_localInbox.begin(), m_localInbox.end());  // New messages at the front
     mlock.unlock(); // Release our lock so that others can access the inbox
     
-};
+}
 
 
 void BitMessage::getInboxMessageByID(std::string msgID, bool setRead){
@@ -686,7 +688,7 @@ void BitMessage::getInboxMessageByID(std::string msgID, bool setRead){
     
     //return message;
     
-};
+}
 
 
 void BitMessage::getAllSentMessages(){
@@ -752,7 +754,7 @@ void BitMessage::getAllSentMessages(){
     std::reverse(m_localOutbox.begin(), m_localOutbox.end());  // New messages at the front
     mlock.unlock();
     
-};
+}
 
 
 BitSentMessage BitMessage::getSentMessageByID(std::string msgID){
@@ -798,7 +800,7 @@ BitSentMessage BitMessage::getSentMessageByID(std::string msgID){
     
     return message;
     
-};
+}
 
 
 BitSentMessage BitMessage::getSentMessageByAckData(std::string ackData){
@@ -844,7 +846,7 @@ BitSentMessage BitMessage::getSentMessageByAckData(std::string ackData){
     
     return message;
     
-};
+}
 
 
 std::vector<BitSentMessage> BitMessage::getSentMessagesBySender(std::string address){
@@ -890,7 +892,7 @@ std::vector<BitSentMessage> BitMessage::getSentMessagesBySender(std::string addr
     
     return outbox;
     
-};
+}
 
 
 void BitMessage::trashMessage(std::string msgID){
@@ -911,7 +913,7 @@ void BitMessage::trashMessage(std::string msgID){
         }
     }
     
-};
+}
 
 
 bool BitMessage::trashSentMessageByAckData(std::string ackData){
@@ -936,7 +938,7 @@ bool BitMessage::trashSentMessageByAckData(std::string ackData){
     
     return true;
     
-};
+}
 
 
 
@@ -970,7 +972,7 @@ void BitMessage::sendMessage(std::string fromAddress, std::string toAddress, bas
     
     //return std::string(ValueString(result.second));
     
-};
+}
 
 
 std::string BitMessage::sendBroadcast(std::string fromAddress, base64 subject, base64 message, int encodingType){
@@ -999,7 +1001,7 @@ std::string BitMessage::sendBroadcast(std::string fromAddress, base64 subject, b
     
     return std::string(ValueString(result.second));
     
-};
+}
 
 
 
@@ -1052,7 +1054,7 @@ void BitMessage::listSubscriptions(){
     INSTANTIATE_MLOCK(m_localSubscriptionListMutex);
     m_localSubscriptionList = subscriptionList;
     mlock.unlock();
-};
+}
 
 
 bool BitMessage::addSubscription(std::string address, base64 label){
@@ -1079,7 +1081,7 @@ bool BitMessage::addSubscription(std::string address, base64 label){
     
     return true;
     
-};
+}
 
 
 bool BitMessage::deleteSubscription(std::string address){
@@ -1104,7 +1106,7 @@ bool BitMessage::deleteSubscription(std::string address){
     
     return true;
     
-};
+}
 
 
 
@@ -1133,7 +1135,7 @@ std::string BitMessage::createChan(base64 password){
     
     return std::string(ValueString(result.second));
     
-};
+}
 
 
 bool BitMessage::joinChan(base64 password, std::string address){
@@ -1159,7 +1161,7 @@ bool BitMessage::joinChan(base64 password, std::string address){
     
     return true;
     
-};
+}
 
 
 bool BitMessage::leaveChan(std::string address){
@@ -1183,7 +1185,7 @@ bool BitMessage::leaveChan(std::string address){
     }
     
     return true;
-};
+}
 
 
 
@@ -1261,7 +1263,7 @@ void BitMessage::createRandomAddress(base64 label, bool eighteenByteRipe, int to
     newestCreatedAddress = std::string(ValueString(result.second));
     mlock.unlock();
     
-};
+}
 
 
 void BitMessage::createDeterministicAddresses(base64 password, int numberOfAddresses, int addressVersionNumber, int streamNumber, bool eighteenByteRipe, int totalDifficulty, int smallMessageDifficulty){
@@ -1314,7 +1316,7 @@ void BitMessage::createDeterministicAddresses(base64 password, int numberOfAddre
     OT_STD_FUNCTION(void()) secondCommand = OT_STD_BIND(&BitMessage::listAddresses, this);
     bm_queue->addToQueue(secondCommand);
     
-};
+}
 
 
 BitMessageAddress BitMessage::getDeterministicAddress(base64 password, int addressVersionNumber, int streamNumber){
@@ -1342,7 +1344,7 @@ BitMessageAddress BitMessage::getDeterministicAddress(base64 password, int addre
     
     return std::string(ValueString(result.second));
     
-};
+}
 
 
 void BitMessage::listAddressBookEntries(){
@@ -1390,7 +1392,7 @@ void BitMessage::listAddressBookEntries(){
     m_localAddressBook = addressBook;
     mlock.unlock();
     
-};
+}
 
 
 bool BitMessage::addAddressBookEntry(std::string address, base64 label){
@@ -1418,7 +1420,7 @@ bool BitMessage::addAddressBookEntry(std::string address, base64 label){
     
     return true;
     
-};
+}
 
 
 bool BitMessage::deleteAddressBookEntry(std::string address){
@@ -1445,7 +1447,7 @@ bool BitMessage::deleteAddressBookEntry(std::string address){
     
     return true;
     
-};
+}
 
 
 void BitMessage::deleteAddress(std::string address){
@@ -1470,7 +1472,7 @@ void BitMessage::deleteAddress(std::string address){
     
     //return true;
     
-};
+}
 
 
 BitDecodedAddress BitMessage::decodeAddress(std::string address){
@@ -1513,7 +1515,7 @@ BitDecodedAddress BitMessage::decodeAddress(std::string address){
     
     return BitDecodedAddress(decodedAddress.get("status", "").asString(), decodedAddress.get("addressVersion", "").asInt(), cleanRipe, decodedAddress.get("streamNumber", "").asInt());
     
-};
+}
 
 
 
@@ -1575,7 +1577,7 @@ int BitMessage::add(int x, int y){
         return ValueInt(result.second);
     }
     
-};
+}
 
 
 std::string BitMessage::getStatus(std::string ackData){
@@ -1601,7 +1603,7 @@ std::string BitMessage::getStatus(std::string ackData){
     
     return std::string(ValueString(result.second));
     
-};
+}
 
 
 void BitMessage::setServerAlive(bool alive){
@@ -1666,5 +1668,7 @@ void BitMessage::initializeUserData(){
     getAllInboxMessages();
     getAllSentMessages();
     listSubscriptions();
+    
+}
     
 }

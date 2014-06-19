@@ -23,6 +23,8 @@
 #  include <unistd.h>
 #endif
 
+namespace bmwrapper {
+
 typedef std::pair<bool, xmlrpc_c::value> XmlResponse;
 
 class XmlRPC {
@@ -30,7 +32,7 @@ class XmlRPC {
 public:
     
     XmlRPC(std::string serverurl, int port=80, bool authrequired=false, int Timeout=10000);
-    ~XmlRPC(){};
+    ~XmlRPC(){}
     
     XmlResponse run(std::string methodName, std::vector<xmlrpc_c::value> parameters);
     void setTimeout(int Timeout);
@@ -57,3 +59,5 @@ private:
     void xmlrpc_millisecond_sleep(unsigned int const milliseconds);
     
 };
+
+}
