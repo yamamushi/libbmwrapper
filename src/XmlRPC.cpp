@@ -9,6 +9,8 @@
 #include <vector>
 #include <utility>
 
+namespace bmwrapper {
+
 
 XmlRPC::XmlRPC(std::string serverurl, int port, bool authrequired, int Timeout) : m_serverurl(serverurl), m_port(port), m_authrequired(authrequired), m_timeout(Timeout) {
     
@@ -118,4 +120,6 @@ void XmlRPC::xmlrpc_millisecond_sleep(unsigned int const milliseconds) {
 #else
     usleep(milliseconds * 1000);
 #endif
+}
+    
 }

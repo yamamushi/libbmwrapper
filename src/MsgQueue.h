@@ -6,6 +6,7 @@
 
 #include "Threading.h"
 
+namespace bmwrapper {
 
 template <typename T>
 class MsgQueue
@@ -74,3 +75,5 @@ private:
     OT_MUTEX(mutex_);
     CONDITION_VARIABLE(cond_);
 };
+
+}
