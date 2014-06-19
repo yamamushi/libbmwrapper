@@ -6,7 +6,7 @@
 
 #include<boost/tokenizer.hpp>
 
-
+namespace bmwrapper {
 
 bool BitMessageQueue::start() {
     
@@ -107,4 +107,6 @@ BitMessageQueue::~BitMessageQueue(){
         /* Will need to refactor this */
     }
     
+}
+
 }
