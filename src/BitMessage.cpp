@@ -54,8 +54,6 @@ namespace bmwrapper {
     
     BitMessage::~BitMessage(){
         
-        std::cerr << "Cleaning Up BitMessage Class" << std::endl; // Temporary
-        
         // Clean up Objects
         
         //  if(!m_forceKill)  // If we haven't asked for a force kill
@@ -66,7 +64,6 @@ namespace bmwrapper {
         delete bm_queue;  // Queue will be stopped automatically upon deletion
         delete m_xmllib;
         
-        std::cerr << "Done Cleaning up BitMessage Class" << std::endl; // Temporary
     }
     
     
@@ -622,7 +619,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getAllInboxMessages", params);
         
         if(result.first == false){
-            std::cerr << "Error: getAllInboxMessages failed" << std::endl;
+            std::cerr << "Error: BitMessage getAllInboxMessages failed" << std::endl;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -638,7 +635,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse inbox\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse inbox" << std::endl; //<< reader.getFormatedErrorMessages();
         }
         
         const Json::Value inboxMessages = root["inboxMessages"];
@@ -682,7 +679,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getInboxMessageByID", params);
         
         if(result.first == false){
-            std::cerr << "Error: getInboxMessageByID failed" << std::endl;
+            std::cerr << "Error: BitMessage getInboxMessageByID failed" << std::endl;
             BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
             //return message;
         }
@@ -703,7 +700,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse inbox\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse inbox" << std::endl; //reader.getFormatedErrorMessages();
             BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
             //return message;
         }
@@ -730,7 +727,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getAllSentMessages", params);
         
         if(result.first == false){
-            std::cerr << "Error: getAllSentMessages failed" << std::endl;
+            std::cerr << "Error: BitMessage getAllSentMessages failed" << std::endl;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -746,7 +743,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse outbox" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse outbox" << std::endl; //reader.getFormatedErrorMessages();
         }
         
         const Json::Value sentMessages = root["sentMessages"];
@@ -812,7 +809,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getSentMessageByID", params);
         
         if(result.first == false){
-            std::cerr << "Error: getSentMessageByID failed" << std::endl;;
+            std::cerr << "Error: BitMessage getSentMessageByID failed" << std::endl;;
             return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -831,7 +828,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse outbox\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse outbox" << std::endl; //reader.getFormatedErrorMessages();
             return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
         }
         
@@ -866,7 +863,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getSentMessageByAckData", params);
         
         if(result.first == false){
-            std::cerr << "Error: getSentMessageByAckData failed" << std::endl;;
+            std::cerr << "Error: BitMessage getSentMessageByAckData failed" << std::endl;;
             return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -885,7 +882,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse outbox\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse outbox" << std::endl; //reader.getFormatedErrorMessages();
             return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
         }
         
@@ -914,7 +911,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getSentMessagesBySender", params);
         
         if(result.first == false){
-            std::cerr << "Error: getAllSentMessages failed" << std::endl;;
+            std::cerr << "Error: BitMessage getAllSentMessages failed" << std::endl;;
             return outbox;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -964,7 +961,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("trashMessage", params);
         
         if(result.first == false){
-            std::cerr << "Error: trashMessage failed" << std::endl;
+            std::cerr << "Error: BitMessage trashMessage failed" << std::endl;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -985,7 +982,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("trashSentMessageByAckData", params);
         
         if(result.first == false){
-            std::cerr << "Error: trashSentMessageByAckData failed" << std::endl;
+            std::cerr << "Error: BitMessage trashSentMessageByAckData failed" << std::endl;
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1019,7 +1016,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("sendMessage", params);
         
         if(result.first == false){
-            std::cerr << "Error: sendMessage failed" << std::endl;
+            std::cerr << "Error: BitMessage sendMessage failed" << std::endl;
             //return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1048,7 +1045,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("sendBroadcast", params);
         
         if(result.first == false){
-            std::cerr << "Error: sendBroadcast failed" << std::endl;
+            std::cerr << "Error: BitMessage sendBroadcast failed" << std::endl;
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1077,7 +1074,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("listSubscriptions", params);
         
         if(result.first == false){
-            std::cerr << "Error: listSubscriptions failed" << std::endl;
+            std::cerr << "Error: BitMessage listSubscriptions failed" << std::endl;
             //return subscriptionList;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1095,7 +1092,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse subscription list\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse subscription list" << std::endl; //reader.getFormatedErrorMessages();
             //return subscriptionList;
         }
         
@@ -1128,7 +1125,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("addSubscription", params);
         
         if(result.first == false){
-            std::cerr << "Error: createChan failed" << std::endl;
+            std::cerr << "Error: BitMessage createChan failed" << std::endl;
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1153,7 +1150,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("deleteSubscription", params);
         
         if(result.first == false){
-            std::cerr << "Error: createChan failed" << std::endl;
+            std::cerr << "Error: BitMessage createChan failed" << std::endl;
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1182,7 +1179,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("createChan", params);
         
         if(result.first == false){
-            std::cerr << "Error: createChan failed" << std::endl;
+            std::cerr << "Error: BitMessage createChan failed" << std::endl;
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1208,7 +1205,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("joinChan", params);
         
         if(result.first == false){
-            std::cerr << "Error: joinChan failed" << std::endl;
+            std::cerr << "Error: BitMessage joinChan failed" << std::endl;
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1233,7 +1230,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("leaveChan", params);
         
         if(result.first == false){
-            std::cerr << "Error: leaveChan failed" << std::endl;
+            std::cerr << "Error: BitMessage leaveChan failed" << std::endl;
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1262,7 +1259,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("listAddresses2", params);
         
         if(result.first == false){
-            std::cerr << "Error: listAddresses2 failed" << std::endl;
+            std::cerr << "Error: BitMessage listAddresses2 failed" << std::endl;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -1278,7 +1275,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
+            std::cerr << "Failed to parse configuration" << std::endl; //reader.getFormatedErrorMessages();
         }
         
         const Json::Value addresses = root["addresses"];
@@ -1308,7 +1305,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("createRandomAddress", params);
         
         if(result.first == false){
-            std::cerr << "Error: createRandomAddress failed" << std::endl;
+            std::cerr << "Error: BitMessage createRandomAddress failed" << std::endl;
             //return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1344,7 +1341,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("createDeterministicAddresses", params);
         
         if(result.first == false){
-            std::cerr << "Error: createDeterministicAddresses failed" << std::endl;
+            std::cerr << "Error: BitMessage createDeterministicAddresses failed" << std::endl;
             //return addressList;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1362,7 +1359,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse address list\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse address list" << std::endl; //reader.getFormatedErrorMessages();
             //return addressList;
         }
         
@@ -1391,7 +1388,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getDeterministicAddress", params);
         
         if(result.first == false){
-            std::cerr << "Error: getDeterministicAddress failed" << std::endl;
+            std::cerr << "Error: BitMessage getDeterministicAddress failed" << std::endl;
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1417,7 +1414,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("listAddressBookEntries", params);
         
         if(result.first == false){
-            std::cerr << "Error: listAddressBookEntries failed" << std::endl;
+            std::cerr << "Error: BitMessage listAddressBookEntries failed" << std::endl;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -1433,7 +1430,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse address list\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse address list" << std::endl; //reader.getFormatedErrorMessages();
         }
         
         const Json::Value addresses = root["addresses"];
@@ -1465,7 +1462,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("addAddressBookEntry", params);
         
         if(result.first == false){
-            std::cerr << "Error: addAddressBookEntry failed" << std::endl;
+            std::cerr << "Error: BitMessage addAddressBookEntry failed" << std::endl;
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1492,7 +1489,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("deleteAddressBookEntry", params);
         
         if(result.first == false){
-            std::cerr << "Error: deleteAddressBookEntry failed" << std::endl;
+            std::cerr << "Error: BitMessage deleteAddressBookEntry failed" << std::endl;
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1519,7 +1516,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("deleteAddress", params);
         
         if(result.first == false){
-            std::cerr << "Error: deleteAddress " << address << " failed" << std::endl;
+            std::cerr << "Error: BitMessage deleteAddress " << address << " failed" << std::endl;
             //return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1564,7 +1561,7 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse configuration" << std::endl; //reader.getFormatedErrorMessages();
             return BitDecodedAddress("", 0, "", 0);
         }
         
@@ -1620,7 +1617,7 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("add", params);
         
         if(result.first == false){
-            std::cerr << "Error: add failed" << std::endl;
+            std::cerr << "Error: BitMessage add failed" << std::endl;
             return -1;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1682,7 +1679,7 @@ namespace bmwrapper {
     
     void BitMessage::checkAlive(){
         
-        if(helloWorld("Hello","World") != "Hello-World"){
+        if(helloWorld("Check","Alive") != "Check-Alive"){
             setServerAlive(false);
         }
         else{

@@ -52,7 +52,7 @@ XmlResponse XmlRPC::run(std::string methodName, std::vector<xmlrpc_c::value> par
         // Check That Auth Requirements have been met
         if(m_authrequired){
             if(!m_authset){
-                std::cout << "Error: XML-RPC Auth is required but has not been set" << std::endl;
+                std::cerr << "Error: XML-RPC Auth is required but has not been set" << std::endl;
                 return std::make_pair(false,xmlrpc_c::value_string(""));
             }
             else{
@@ -77,10 +77,10 @@ XmlResponse XmlRPC::run(std::string methodName, std::vector<xmlrpc_c::value> par
         return std::make_pair(true,response);
         
     } catch (std::exception const& e) {
-        std::cerr << "Client threw error: " << e.what() << std::endl;
+        //std::cerr << "Client threw error: " << e.what() << std::endl;
         return std::make_pair(false,xmlrpc_c::value_string(""));
     } catch (...) {
-        std::cerr << "Client threw unexpected error." << std::endl;
+        //std::cerr << "Client threw unexpected error." << std::endl;
         return std::make_pair(false,xmlrpc_c::value_string(""));
     }
     
