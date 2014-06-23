@@ -16,7 +16,7 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - cmake .. && make
+  - cmake -DJSONCPP_LIB_BUILD_SHARED=ON .. && make
 branches:
   only:
     - master
