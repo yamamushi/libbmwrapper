@@ -37,7 +37,7 @@ namespace bmwrapper {
         // Runs to setup our counter
         checkAlive();
         
-        initializeUserData();
+        //initializeUserData();
         
         // Thread Handler
         bm_queue = new BitMessageQueue(this);
@@ -82,6 +82,11 @@ namespace bmwrapper {
     
     bool BitMessage::createAddress(std::string label){
         
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         listAddresses();
         
         INSTANTIATE_MLOCK(m_localIdentitiesMutex);
@@ -119,6 +124,11 @@ namespace bmwrapper {
     
     
     bool BitMessage::createDeterministicAddress(std::string key, std::string label){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
         
         listAddresses();
         
@@ -165,6 +175,12 @@ namespace bmwrapper {
     
     
     bool BitMessage::deleteLocalAddress(std::string address){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         try{
             
             OT_STD_FUNCTION(void()) firstCommand = OT_STD_BIND(&BitMessage::deleteAddress, this, address);
@@ -181,6 +197,11 @@ namespace bmwrapper {
     
     
     bool BitMessage::addressAccessible(std::string address){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
         
         INSTANTIATE_MLOCK(m_localIdentitiesMutex);
         
@@ -234,6 +255,12 @@ namespace bmwrapper {
     
     
     bool BitMessage::checkLocalAddresses(){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         try{
             OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::listAddresses, this);
             bm_queue->addToQueue(command);
@@ -247,6 +274,11 @@ namespace bmwrapper {
     
     bool BitMessage::checkRemoteAddresses(){
         
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         try{
             OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::listAddressBookEntries, this); // push a list address request to the queue.
             bm_queue->addToQueue(command);
@@ -258,6 +290,12 @@ namespace bmwrapper {
     }
     
     bool BitMessage::checkMail(){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         try{
             OT_STD_FUNCTION(void()) getInboxMessages = OT_STD_BIND(&BitMessage::getAllInboxMessages, this);
             bm_queue->addToQueue(getInboxMessages);
@@ -272,6 +310,11 @@ namespace bmwrapper {
     } // checks for new mail, returns true if there is new mail in the queue. // Queued
     
     bool BitMessage::newMailExists(std::string address){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
         
         if(m_localInbox.size() == 0){
             getAllInboxMessages(); // Blocking call, otherwise this may cause problems.
@@ -305,7 +348,9 @@ namespace bmwrapper {
         if(m_localInbox.size() == 0){
             getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
         }
+        
         INSTANTIATE_MLOCK(m_localInboxMutex);
+        
         try{
             
             if(address != ""){
@@ -407,6 +452,11 @@ namespace bmwrapper {
     
     bool BitMessage::deleteMessage(std::string messageID){
         
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         if(m_localInbox.size() == 0){
             getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
         }
@@ -437,6 +487,11 @@ namespace bmwrapper {
     
     bool BitMessage::deleteOutMessage(std::string messageID){
         
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         if(m_localOutbox.size() == 0){
             getAllSentMessages();  // Blocking call, otherwise this may cause problems.
         }
@@ -465,6 +520,11 @@ namespace bmwrapper {
     
     
     bool BitMessage::markRead(std::string messageID, bool read){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
         
         if(m_localInbox.size() == 0){
             getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
@@ -495,6 +555,12 @@ namespace bmwrapper {
     
     
     bool BitMessage::sendMail(NetworkMail message){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
         try{
             
             OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::sendMessage, this, message.getTo(), message.getFrom(), base64(message.getSubject()), base64(message.getMessage()), 2);
@@ -509,6 +575,11 @@ namespace bmwrapper {
     
     
     std::vector<std::pair<std::string,std::string> > BitMessage::getSubscriptions(){
+        
+        if(!accessible()){
+            checkAlive();
+            return std::vector<std::pair<std::string, std::string> >();
+        }
         
         INSTANTIATE_MLOCK(m_localSubscriptionListMutex);
         
@@ -535,6 +606,11 @@ namespace bmwrapper {
     
     
     bool BitMessage::refreshSubscriptions(){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
         
         try{
             OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::listSubscriptions, this);
@@ -620,6 +696,8 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage getAllInboxMessages failed" << std::endl;
+            setServerAlive(false);
+            
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -680,7 +758,8 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage getInboxMessageByID failed" << std::endl;
-            BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
+            setServerAlive(false);
+            //BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
             //return message;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -688,7 +767,7 @@ namespace bmwrapper {
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
+                //BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
                 //return message;
             }
         }
@@ -728,6 +807,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage getAllSentMessages failed" << std::endl;
+            setServerAlive(false);
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -810,6 +890,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage getSentMessageByID failed" << std::endl;;
+            setServerAlive(false);
             return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -863,7 +944,8 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getSentMessageByAckData", params);
         
         if(result.first == false){
-            std::cerr << "Error: BitMessage getSentMessageByAckData failed" << std::endl;;
+            std::cerr << "Error: BitMessage getSentMessageByAckData failed" << std::endl;
+            setServerAlive(false);
             return BitSentMessage("", "", "", base64(""), base64(""), 0, 0, "", "");
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -911,7 +993,8 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("getSentMessagesBySender", params);
         
         if(result.first == false){
-            std::cerr << "Error: BitMessage getAllSentMessages failed" << std::endl;;
+            std::cerr << "Error: BitMessage getAllSentMessages failed" << std::endl;
+            setServerAlive(false);
             return outbox;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -962,6 +1045,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage trashMessage failed" << std::endl;
+            setServerAlive(false);
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -983,6 +1067,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage trashSentMessageByAckData failed" << std::endl;
+            setServerAlive(false);
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1017,6 +1102,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage sendMessage failed" << std::endl;
+            setServerAlive(false);
             //return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1046,6 +1132,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage sendBroadcast failed" << std::endl;
+            setServerAlive(false);
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1075,6 +1162,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage listSubscriptions failed" << std::endl;
+            setServerAlive(false);
             //return subscriptionList;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1126,6 +1214,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage createChan failed" << std::endl;
+            setServerAlive(false);
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1151,6 +1240,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage createChan failed" << std::endl;
+            setServerAlive(false);
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1180,6 +1270,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage createChan failed" << std::endl;
+            setServerAlive(false);
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1206,6 +1297,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage joinChan failed" << std::endl;
+            setServerAlive(false);
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1231,6 +1323,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage leaveChan failed" << std::endl;
+            setServerAlive(false);
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1260,6 +1353,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage listAddresses2 failed" << std::endl;
+            setServerAlive(false);
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -1306,6 +1400,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage createRandomAddress failed" << std::endl;
+            setServerAlive(false);
             //return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1342,6 +1437,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage createDeterministicAddresses failed" << std::endl;
+            setServerAlive(false);
             //return addressList;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1389,6 +1485,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage getDeterministicAddress failed" << std::endl;
+            setServerAlive(false);
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1415,6 +1512,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage listAddressBookEntries failed" << std::endl;
+            setServerAlive(false);
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
@@ -1463,6 +1561,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage addAddressBookEntry failed" << std::endl;
+            setServerAlive(false);
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1490,6 +1589,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage deleteAddressBookEntry failed" << std::endl;
+            setServerAlive(false);
             return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1517,6 +1617,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage deleteAddress " << address << " failed" << std::endl;
+            setServerAlive(false);
             //return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1543,6 +1644,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error Accessing BitMessage API" << std::endl;
+            setServerAlive(false);
             return BitDecodedAddress("", 0, "", 0);
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1591,7 +1693,10 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("helloWorld", params);
         
         if(result.first == false){
-            std::cerr << "Error Accessing BitMessage API" << std::endl;
+            // No error reporting here for the time being, as this is a core piece of the checkAlive utility, this could
+            // Spit out a lot of extraneous information otherwise.
+            //std::cerr << "Error Accessing BitMessage API" << std::endl;
+            setServerAlive(false);
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1618,6 +1723,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error: BitMessage add failed" << std::endl;
+            setServerAlive(false);
             return -1;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1648,6 +1754,7 @@ namespace bmwrapper {
         
         if(result.first == false){
             std::cerr << "Error Accessing BitMessage API" << std::endl;
+            setServerAlive(false);
             return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
@@ -1680,10 +1787,13 @@ namespace bmwrapper {
     void BitMessage::checkAlive(){
         
         if(helloWorld("Check","Alive") != "Check-Alive"){
+            std::cerr << "Error: BitMessage API service is inaccessible" << std::endl;
             setServerAlive(false);
         }
         else{
+            std::cerr << "BitMessage API Service is now accessible" << std::endl;
             setServerAlive(true);
+            initializeUserData();
         }
         
     }
