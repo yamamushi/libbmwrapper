@@ -23,9 +23,12 @@ message(STATUS "Verbose:         ${LIBBMWRAPPER_BUILD_VERBOSE}")
 
 
 #-----------------------------------------------------------------------------
-# Collect all binaries into bin subdirectory
+# Collect into bin or lib subdirectories
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+    CACHE PATH "Single directory for all static libraries.")
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+    CACHE PATH "Single directory for all dynamic libraries on Unix.")
 
 
 #-----------------------------------------------------------------------------
@@ -75,6 +78,7 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_COMPONENTS system random)
 find_package(Boost 1.53 REQUIRED ${Boost_COMPONENTS})
 find_package(OpenSSL REQUIRED)
+find_package(XMLRPC REQUIRED c++2 libwww-client)
 
 
 #-----------------------------------------------------------------------------
