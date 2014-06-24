@@ -3,7 +3,6 @@ set(NAME bmwrapper)
 set(SRC
   BitMessage.cpp
   BitMessageQueue.cpp
-  Network.cpp
   XmlRPC.cpp
   base64.cpp
 )
@@ -35,3 +34,5 @@ target_link_libraries(${NAME}-static
 )
 
 set_target_properties(${NAME}-static PROPERTIES OUTPUT_NAME ${NAME})
+INSTALL(TARGETS ${NAME}-static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+INSTALL(TARGETS ${NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
