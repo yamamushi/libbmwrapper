@@ -1,4 +1,6 @@
 #pragma once
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 //
 //  Network.h
 //  vp-auditservice
@@ -75,12 +77,12 @@ private:
     std::string m_subject;
     std::string m_mail;
     
-    std::time_t m_received;
-    std::time_t m_sent;
-    
     bool m_readStatus;
     
     std::string m_messageID;
+    
+    std::time_t m_received;
+    std::time_t m_sent;
     
 };
 
