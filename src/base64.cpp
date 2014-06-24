@@ -34,6 +34,9 @@
 
 #include "base64.h"
 
+namespace bmwrapper {
+    
+    
 static const std::string base64_chars =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 "abcdefghijklmnopqrstuvwxyz"
@@ -127,4 +130,7 @@ std::string base64::p_decode(std::string const& encoded_string) {
     }
     
     return ret;
+}
+
+
 }

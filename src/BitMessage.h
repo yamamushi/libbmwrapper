@@ -13,6 +13,10 @@
 #include "XmlRPC.h"
 #include "BitMessageQueue.h"
 
+
+namespace bmwrapper{
+    
+
 typedef std::string BitMessageAddress;
 
 class BitMessageIdentity {
@@ -37,7 +41,7 @@ private:
     bool m_chan;
     
 };
-
+    
 typedef std::vector<BitMessageIdentity> BitMessageIdentities;
 
 
@@ -178,7 +182,7 @@ public:
     BitMessage(std::string commstring);
     ~BitMessage();
     
-    void forceKill(bool kill){m_forceKill = kill;};
+    void forceKill(bool kill){m_forceKill = kill;}
     
     // Virtual Function Implementations
     bool accessible();
@@ -207,11 +211,13 @@ public:
     std::vector<_SharedPtr<NetworkMail> > getAllUnreadMail();
     
     bool deleteMessage(std::string messageID); // Any part of the message should be able to be used to delete it from an inbox    // Queued
+    bool deleteOutMessage(std::string messageID); // Any part of the message should be able to be used to delete it from an outbox    // Queued
+
     bool markRead(std::string messageID, bool read=true); // By default this marks a given message as read or not, not all API's will support this and should thus return false.  // Queued
     
     bool sendMail(NetworkMail message); // Queued
     
-    bool publishSupport(){return true;};
+    bool publishSupport(){return true;}
     std::vector<std::pair<std::string,std::string> > getSubscriptions();
     bool refreshSubscriptions();
     
@@ -386,6 +392,7 @@ private:
 };
 
 
+}
 
 
 

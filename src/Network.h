@@ -1,4 +1,6 @@
 #pragma once
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 //
 //  Network.h
 //  vp-auditservice
@@ -64,7 +66,7 @@ public:
     std::string getMessage(){return m_mail;}
     std::time_t getReceivedTime(){return m_received;}
     std::time_t getSentTime(){return m_sent;}
-    void        setRead(bool status){m_readStatus = status;};
+    void        setRead(bool status){m_readStatus = status;}
     bool        getRead(){ return m_readStatus;}
     std::string getMessageID(){return m_messageID;}
     
@@ -75,12 +77,12 @@ private:
     std::string m_subject;
     std::string m_mail;
     
-    std::time_t m_received;
-    std::time_t m_sent;
-    
     bool m_readStatus;
     
     std::string m_messageID;
+    
+    std::time_t m_received;
+    std::time_t m_sent;
     
 };
 
@@ -124,6 +126,7 @@ public:
     virtual std::vector<_SharedPtr<NetworkMail> > getAllUnreadMail(){return std::vector<_SharedPtr<NetworkMail> >();}
     
     virtual bool deleteMessage(std::string messageID){return false;} // passed as a string, as different protocols handle message ID's differently (BitMessage for example)
+    virtual bool deleteOutMessage(std::string messageID){return false;} // passed as a string, as different protocols handle message ID's differently (BitMessage for example)
     virtual bool markRead(std::string messageID, bool read=true){return false;} // By default this marks a given message as read or not, not all API's will support this and should thus return false.
     
     virtual bool sendMail(NetworkMail message){return false;} // Need To, From, Subject and Message in formatted NetworkMail object

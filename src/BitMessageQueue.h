@@ -8,14 +8,15 @@
 //#include <mutex>
 //#include <condition_variable>
 
+namespace bmwrapper {
+
 class BitMessage;
-
-
+    
 class BitMessageQueue {
     
 public:
     
-    BitMessageQueue(BitMessage *parent) : parentInterface(parent), m_stop(true), m_thread() { }
+    BitMessageQueue() : m_stop(true), m_thread() { }
     ~BitMessageQueue();
     
     // Public Thread Managers
@@ -35,7 +36,7 @@ public:
 protected:
     
     OT_ATOMIC(m_stop);
-    void run(){ while(!m_stop){parseNextMessage();} }; // Obviously this will be our message parsing loop
+    void run(){ while(!m_stop){parseNextMessage();} } // Obviously this will be our message parsing loop
     
 private:
     
@@ -47,8 +48,6 @@ private:
     
     OT_ATOMIC(m_working);
     
-    BitMessage *parentInterface;
-    
     MsgQueue<OT_STD_FUNCTION(void())> MasterQueue;
     
     // Functions
@@ -56,3 +55,5 @@ private:
     bool parseNextMessage();
     
 };
+
+}

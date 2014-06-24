@@ -9,6 +9,8 @@
 #include <vector>
 #include <utility>
 
+namespace bmwrapper {
+
 
 XmlRPC::XmlRPC(std::string serverurl, int port, bool authrequired, int Timeout) : m_serverurl(serverurl), m_port(port), m_authrequired(authrequired), m_timeout(Timeout) {
     
@@ -38,7 +40,7 @@ XmlResponse XmlRPC::run(std::string methodName, std::vector<xmlrpc_c::value> par
         
         for(int i=0; i < parameters.size(); i++){
             xmlrpc_c::value newParameter(parameters.at(i));
-            params.addc(newParameter);
+            params.add(newParameter);
         }
         
         // Construct the Server URL
@@ -50,7 +52,7 @@ XmlResponse XmlRPC::run(std::string methodName, std::vector<xmlrpc_c::value> par
         // Check That Auth Requirements have been met
         if(m_authrequired){
             if(!m_authset){
-                std::cout << "Error: XML-RPC Auth is required but has not been set" << std::endl;
+                std::cerr << "Error: XML-RPC Auth is required but has not been set" << std::endl;
                 return std::make_pair(false,xmlrpc_c::value_string(""));
             }
             else{
@@ -75,10 +77,10 @@ XmlResponse XmlRPC::run(std::string methodName, std::vector<xmlrpc_c::value> par
         return std::make_pair(true,response);
         
     } catch (std::exception const& e) {
-        std::cerr << "Client threw error: " << e.what() << std::endl;
+        //std::cerr << "Client threw error: " << e.what() << std::endl;
         return std::make_pair(false,xmlrpc_c::value_string(""));
     } catch (...) {
-        std::cerr << "Client threw unexpected error." << std::endl;
+        //std::cerr << "Client threw unexpected error." << std::endl;
         return std::make_pair(false,xmlrpc_c::value_string(""));
     }
     
@@ -118,4 +120,6 @@ void XmlRPC::xmlrpc_millisecond_sleep(unsigned int const milliseconds) {
 #else
     usleep(milliseconds * 1000);
 #endif
+}
+    
 }
