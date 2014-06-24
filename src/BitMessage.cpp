@@ -40,7 +40,7 @@ namespace bmwrapper {
         //initializeUserData();
         
         // Thread Handler
-        bm_queue = new BitMessageQueue(this);
+        bm_queue = new BitMessageQueue();
         
         /* TESTING */
         
@@ -99,7 +99,7 @@ namespace bmwrapper {
             }
             
             
-            for(int x = 0; x < m_localIdentities.size(); x++){
+            for(unsigned int x = 0; x < m_localIdentities.size(); x++){
                 if(m_localIdentities.at(x).getLabel().decoded() == label){
                     std::cerr << "Cannot Create Address: Label " << label << " already in Use" << std::endl;
                     mlock.unlock();
@@ -148,7 +148,7 @@ namespace bmwrapper {
                 return false;
             }
             
-            for(int x = 0; x < m_localIdentities.size(); x++){
+            for(unsigned int x = 0; x < m_localIdentities.size(); x++){
                 if(m_localIdentities.at(x).getLabel().decoded() == label){
                     std::cerr << "Cannot Create Address: Label " << label << " already in Use" << std::endl;
                     mlock.unlock();
@@ -205,7 +205,7 @@ namespace bmwrapper {
         
         INSTANTIATE_MLOCK(m_localIdentitiesMutex);
         
-        for(int x = 0; x < m_localIdentities.size(); x++){
+        for(unsigned int x = 0; x < m_localIdentities.size(); x++){
             if(m_localIdentities.at(x).getAddress() == address){
                 mlock.unlock();
                 return true;
@@ -226,7 +226,7 @@ namespace bmwrapper {
         INSTANTIATE_MLOCK(m_localAddressBookMutex);
         
         std::vector<std::pair<std::string, std::string> > addresses;
-        for(int x = 0; x < m_localAddressBook.size(); x++){
+        for(unsigned int x = 0; x < m_localAddressBook.size(); x++){
             std::pair<std::string, std::string> address(m_localAddressBook.at(x).getLabel().decoded(), m_localAddressBook.at(x).getAddress());
             addresses.push_back(address);
         }
@@ -243,7 +243,7 @@ namespace bmwrapper {
         
         std::vector<std::pair<std::string, std::string> > addresses;
         
-        for(int x = 0; x < m_localIdentities.size(); x++){
+        for(unsigned int x = 0; x < m_localIdentities.size(); x++){
             std::pair<std::string, std::string> address(m_localIdentities.at(x).getLabel().decoded(), m_localIdentities.at(x).getAddress());
             addresses.push_back(address);
         }
@@ -322,7 +322,7 @@ namespace bmwrapper {
         INSTANTIATE_MLOCK(m_localInboxMutex);
         
         if(address != ""){
-            for(int x=0; x<m_localInbox.size(); x++){
+            for(unsigned int x=0; x<m_localInbox.size(); x++){
                 
                 if(m_localInbox.at(x)->getTo() == address && m_localInbox.at(x)->getRead() == false){
                     mlock.unlock();
@@ -331,7 +331,7 @@ namespace bmwrapper {
             }
         }
         else{
-            for(int x = 0; x < m_localInbox.size(); x++){
+            for(unsigned int x = 0; x < m_localInbox.size(); x++){
                 if(m_localInbox.at(x)->getRead() == false){
                     mlock.unlock();
                     return true;
@@ -355,7 +355,7 @@ namespace bmwrapper {
             
             if(address != ""){
                 std::vector<_SharedPtr<NetworkMail> > inboxForAddress;
-                for(int x=0; x<m_localInbox.size(); x++){
+                for(unsigned int x=0; x<m_localInbox.size(); x++){
                     if(m_localInbox.at(x)->getTo() == address)
                         inboxForAddress.push_back(m_localInbox.at(x));
                 }
@@ -388,7 +388,7 @@ namespace bmwrapper {
             
             if(address != ""){
                 std::vector<_SharedPtr<NetworkMail> > outboxForAddress;
-                for(int x=0; x<m_localOutbox.size(); x++){
+                for(unsigned int x=0; x<m_localOutbox.size(); x++){
                     if(m_localOutbox.at(x)->getFrom() == address)
                         outboxForAddress.push_back(m_localOutbox.at(x));
                 }
@@ -424,7 +424,7 @@ namespace bmwrapper {
         try{
             
             if(address != ""){
-                for(int x=0; x<m_localInbox.size(); x++){
+                for(unsigned int x=0; x<m_localInbox.size(); x++){
                     if(m_localInbox.at(x)->getTo() == address && m_localInbox.at(x)->getRead() == false)
                         unreadMail.push_back(m_localInbox.at(x));
                 }
@@ -432,7 +432,7 @@ namespace bmwrapper {
                 return unreadMail;
             }
             else{
-                for(int x=0; x<m_localInbox.size(); x++){
+                for(unsigned int x=0; x<m_localInbox.size(); x++){
                     if(m_localInbox.at(x)->getRead() == false)
                         unreadMail.push_back(m_localInbox.at(x));
                 }
@@ -461,7 +461,7 @@ namespace bmwrapper {
             getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
         }
         INSTANTIATE_MLOCK(m_localInboxMutex);
-        for(int x=0; x<m_localInbox.size(); x++){
+        for(unsigned int x=0; x<m_localInbox.size(); x++){
             
             if(m_localInbox.at(x)->getMessageID() == messageID){
                 m_localInbox.erase(m_localInbox.begin() + x);
@@ -496,7 +496,7 @@ namespace bmwrapper {
             getAllSentMessages();  // Blocking call, otherwise this may cause problems.
         }
         INSTANTIATE_MLOCK(m_localOutboxMutex);
-        for(int x=0; x<m_localOutbox.size(); x++){
+        for(unsigned int x=0; x<m_localOutbox.size(); x++){
             
             if(m_localOutbox.at(x)->getMessageID() == messageID){
                 m_localOutbox.erase(m_localOutbox.begin() + x);
@@ -531,7 +531,7 @@ namespace bmwrapper {
         }
         
         INSTANTIATE_MLOCK(m_localInboxMutex);
-        for(int x=0; x<m_localInbox.size(); x++){
+        for(unsigned int x=0; x<m_localInbox.size(); x++){
             
             if(m_localInbox.at(x)->getMessageID() == messageID){
                 m_localInbox.at(x)->setRead(read);
@@ -590,7 +590,7 @@ namespace bmwrapper {
         }
         else{
             std::vector<std::pair<std::string, std::string> > subscriptionList;
-            for(int x = 0; x < m_localSubscriptionList.size(); x++){
+            for(unsigned int x = 0; x < m_localSubscriptionList.size(); x++){
                 std::pair<std::string, std::string> subscription(m_localSubscriptionList.at(x).getLabel().decoded(), m_localSubscriptionList.at(x).getAddress());
                 subscriptionList.push_back(subscription);
             }
@@ -717,7 +717,7 @@ namespace bmwrapper {
         }
         
         const Json::Value inboxMessages = root["inboxMessages"];
-        for ( int index = 0; index < inboxMessages.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < inboxMessages.size(); ++index ){  // Iterates over the sequence elements.
             
             // We need to sanitize our string, or else it will get cut off because of the newlines.
             std::string dirtyMessage = inboxMessages[index].get("message", "").asString();
@@ -735,7 +735,7 @@ namespace bmwrapper {
         
         m_localInbox.clear();
         m_localUnformattedInbox.clear();
-        for(int x=0; x<inbox.size(); x++){
+        for(unsigned int x=0; x<inbox.size(); x++){
             m_localUnformattedInbox.push_back(inbox.at(x));
             _SharedPtr<NetworkMail> l_mail( new NetworkMail(inbox.at(x).getFromAddress(), inbox.at(x).getToAddress(), inbox.at(x).getSubject().decoded(), inbox.at(x).getMessage().decoded(), inbox.at(x).getRead(), inbox.at(x).getMessageID(), inbox.at(x).getReceivedTime() ));
             
@@ -827,7 +827,7 @@ namespace bmwrapper {
         }
         
         const Json::Value sentMessages = root["sentMessages"];
-        for ( int index = 0; index < sentMessages.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < sentMessages.size(); ++index ){  // Iterates over the sequence elements.
             
             // We need to sanitize our string, or else it will get cut off because of the newlines.
             std::string dirtyMessage = sentMessages[index].get("message", "").asString();
@@ -852,7 +852,7 @@ namespace bmwrapper {
         
         m_localOutbox.clear();
         m_localUnformattedOutbox.clear();
-        for(int x=0; x<outbox.size(); x++){
+        for(unsigned int x=0; x<outbox.size(); x++){
             m_localUnformattedOutbox.push_back(outbox.at(x));
             
             //        NetworkMail(std::string from="",
@@ -1011,7 +1011,7 @@ namespace bmwrapper {
         Json::Reader reader;
         
         const Json::Value sentMessages = root["sentMessages"];
-        for ( int index = 0; index < sentMessages.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < sentMessages.size(); ++index ){  // Iterates over the sequence elements.
             
             // We need to sanitize our string, or else it will get cut off because of the newlines.
             std::string dirtyMessage = sentMessages[index].get("message", "").asString();
@@ -1185,7 +1185,7 @@ namespace bmwrapper {
         }
         
         const Json::Value subscriptions = root["subscriptions"];
-        for ( int index = 0; index < subscriptions.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < subscriptions.size(); ++index ){  // Iterates over the sequence elements.
             
             std::string dirtyLabel = subscriptions[index].get("label", "").asString();
             dirtyLabel.erase(std::remove(dirtyLabel.begin(), dirtyLabel.end(), '\n'), dirtyLabel.end());
@@ -1373,7 +1373,7 @@ namespace bmwrapper {
         }
         
         const Json::Value addresses = root["addresses"];
-        for ( int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
             BitMessageIdentity entry(base64(addresses[index].get("label", "").asString(), true), addresses[index].get("address", "").asString(), addresses[index].get("stream", 0).asInt(), addresses[index].get("enabled", false).asBool(), addresses[index].get("chan", false).asBool());
             
             responses.push_back(entry);
@@ -1460,7 +1460,7 @@ namespace bmwrapper {
         }
         
         const Json::Value addresses = root["addresses"];
-        for ( int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
             BitMessageAddress generatedAddress = addresses[index].asString();
             
             addressList.push_back(generatedAddress);
@@ -1532,7 +1532,7 @@ namespace bmwrapper {
         }
         
         const Json::Value addresses = root["addresses"];
-        for ( int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
             
             std::string dirtyLabel = addresses[index].get("label", "").asString();
             dirtyLabel.erase(std::remove(dirtyLabel.begin(), dirtyLabel.end(), '\n'), dirtyLabel.end());

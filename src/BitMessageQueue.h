@@ -16,7 +16,7 @@ class BitMessageQueue {
     
 public:
     
-    BitMessageQueue(BitMessage *parent) : parentInterface(parent), m_stop(true), m_thread() { }
+    BitMessageQueue() : m_stop(true), m_thread() { }
     ~BitMessageQueue();
     
     // Public Thread Managers
@@ -47,8 +47,6 @@ private:
     CONDITION_VARIABLE(m_conditional);
     
     OT_ATOMIC(m_working);
-    
-    BitMessage *parentInterface;
     
     MsgQueue<OT_STD_FUNCTION(void())> MasterQueue;
     
