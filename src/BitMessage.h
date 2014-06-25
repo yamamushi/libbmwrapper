@@ -186,6 +186,7 @@ public:
     
     // Virtual Function Implementations
     bool accessible();
+    bool pollStatus();
     
     std::string moduleType(){return "BitMessage";}
     

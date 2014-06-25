@@ -29,37 +29,30 @@ namespace bmwrapper {
     
     BitMessage::BitMessage(std::string commstring) : NetworkModule(commstring) {
         
-        parseCommstring(commstring);  // This is its own function now, purely for parsing and setting up the config as necessary.
+        // Pass our config string to be parsed locally
+        parseCommstring(commstring);
         
+        // Start our XML-RPC interface
         m_xmllib = new XmlRPC(m_host, m_port, true, 10000);
         m_xmllib->setAuth(m_username, m_pass);
         
         // Runs to setup our counter
         checkAlive();
         
-        //initializeUserData();
+        // Not necessary because checkAlive will take care of this for us.
+        // initializeUserData();
         
         // Thread Handler
         bm_queue = new BitMessageQueue();
         
-        /* TESTING */
-        
         startQueue();   // Start Listener Thread
-        //std::this_thread::sleep_for(std::chrono::seconds(1));  // Testing this functionality - Pause while listener posts to cout.
-        //stopQueue();    // Stop Listener Thread
         
-        /* End Testing */
     }
     
     
     BitMessage::~BitMessage(){
         
         // Clean up Objects
-        
-        //  if(!m_forceKill)  // If we haven't asked for a force kill
-        //      while(bm_queue->processing()){
-        //          ; // If we're in the middle of processing, don't kill the message queue.
-        //      }
         
         delete bm_queue;  // Queue will be stopped automatically upon deletion
         delete m_xmllib;
@@ -79,6 +72,13 @@ namespace bmwrapper {
         
     }
     
+    
+    bool BitMessage::pollStatus(){
+        
+        checkAlive();
+        return accessible();
+        
+    }
     
     bool BitMessage::createAddress(std::string label){
         
@@ -120,7 +120,7 @@ namespace bmwrapper {
             mlock.unlock();
             return false;
         }
-    }  // Queued
+    }
     
     
     bool BitMessage::createDeterministicAddress(std::string key, std::string label){
@@ -171,7 +171,7 @@ namespace bmwrapper {
             return false;
         }
         
-    }  // Queued
+    }
     
     
     bool BitMessage::deleteLocalAddress(std::string address){
@@ -213,13 +213,14 @@ namespace bmwrapper {
         }
         mlock.unlock();
         
-        checkLocalAddresses(); // If the address isn't acccessible, try and fetch the latest
+        // If the address isn't acccessible, try and fetch the latest
         // Address book from the API server for another try later.
         // In most cases, you won't be checking for an address that you
         // Don't already know about from the addressbook.
+        checkLocalAddresses();
         
         return false;
-    } // Queued
+    }
     
     std::vector<std::pair<std::string, std::string> > BitMessage::getRemoteAddresses(){
         
@@ -235,7 +236,7 @@ namespace bmwrapper {
         
         return addresses;
         
-    } // Queued
+    }
     
     std::vector<std::pair<std::string, std::string> > BitMessage::getLocalAddresses(){
         
@@ -269,7 +270,7 @@ namespace bmwrapper {
         catch(...){
             return false;
         }
-    } // Queued
+    }
     
     
     bool BitMessage::checkRemoteAddresses(){
@@ -280,7 +281,7 @@ namespace bmwrapper {
         }
         
         try{
-            OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::listAddressBookEntries, this); // push a list address request to the queue.
+            OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::listAddressBookEntries, this);
             bm_queue->addToQueue(command);
             return true;
         }
@@ -289,6 +290,7 @@ namespace bmwrapper {
         }
     }
     
+    // Checks for new mail, returns true if there is new mail in the queue.
     bool BitMessage::checkMail(){
         
         if(!accessible()){
@@ -307,7 +309,7 @@ namespace bmwrapper {
             return false;
             
         }
-    } // checks for new mail, returns true if there is new mail in the queue. // Queued
+    }
     
     bool BitMessage::newMailExists(std::string address){
         
@@ -346,7 +348,8 @@ namespace bmwrapper {
     std::vector<_SharedPtr<NetworkMail> > BitMessage::getInbox(std::string address){
         
         if(m_localInbox.size() == 0){
-            getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
+            // Blocking call, otherwise this may cause problems.
+            getAllInboxMessages();
         }
         
         INSTANTIATE_MLOCK(m_localInboxMutex);
@@ -376,12 +379,14 @@ namespace bmwrapper {
         
     }
     
-    std::vector<_SharedPtr<NetworkMail> > BitMessage::getAllInboxes(){return getInbox("");} // Note that this is just a passthrough way of calling getInbox() to adhere to the interface.
+    // Note that this is just a passthrough way of calling getInbox() to adhere to the interface.
+    std::vector<_SharedPtr<NetworkMail> > BitMessage::getAllInboxes(){return getInbox("");}
     
     std::vector<_SharedPtr<NetworkMail> > BitMessage::getOutbox(std::string address){
         
         if(m_localOutbox.size() == 0){
-            getAllSentMessages();  // Blocking call, otherwise this may cause problems.
+            // Blocking call, otherwise this may cause problems.
+            getAllSentMessages();
         }
         INSTANTIATE_MLOCK(m_localOutboxMutex);
         try{
@@ -418,7 +423,8 @@ namespace bmwrapper {
         std::vector<_SharedPtr<NetworkMail> > unreadMail;
         
         if(m_localInbox.size() == 0){
-            getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
+            // Blocking call, otherwise this may cause problems.
+            getAllInboxMessages();
         }
         INSTANTIATE_MLOCK(m_localInboxMutex);
         try{
@@ -448,7 +454,8 @@ namespace bmwrapper {
         return unreadMail;
     }
     
-    std::vector<_SharedPtr<NetworkMail> > BitMessage::getAllUnreadMail(){return getUnreadMail("");} // Note that this is just a passthrough way of calling getUnreadMail() to adhere to the interface.
+    // Note that this is just a passthrough way of calling getUnreadMail() to adhere to the interface.
+    std::vector<_SharedPtr<NetworkMail> > BitMessage::getAllUnreadMail(){return getUnreadMail("");}
     
     bool BitMessage::deleteMessage(std::string messageID){
         
@@ -458,7 +465,8 @@ namespace bmwrapper {
         }
         
         if(m_localInbox.size() == 0){
-            getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
+            // Blocking call, otherwise this may cause problems.
+            getAllInboxMessages();
         }
         INSTANTIATE_MLOCK(m_localInboxMutex);
         for(unsigned int x=0; x<m_localInbox.size(); x++){
@@ -481,7 +489,7 @@ namespace bmwrapper {
         mlock.unlock();
         return false;
         
-    } // Any part of the message should be able to be used to delete it from an inbox
+    }
     
     
     
@@ -493,7 +501,8 @@ namespace bmwrapper {
         }
         
         if(m_localOutbox.size() == 0){
-            getAllSentMessages();  // Blocking call, otherwise this may cause problems.
+            // Blocking call, otherwise this may cause problems.
+            getAllSentMessages();
         }
         INSTANTIATE_MLOCK(m_localOutboxMutex);
         for(unsigned int x=0; x<m_localOutbox.size(); x++){
@@ -516,7 +525,7 @@ namespace bmwrapper {
         mlock.unlock();
         return false;
         
-    } // Any part of the message should be able to be used to delete it from an outbox
+    }
     
     
     bool BitMessage::markRead(std::string messageID, bool read){
@@ -527,7 +536,8 @@ namespace bmwrapper {
         }
         
         if(m_localInbox.size() == 0){
-            getAllInboxMessages();  // Blocking call, otherwise this may cause problems.
+            // Blocking call, otherwise this may cause problems.
+            getAllInboxMessages();
         }
         
         INSTANTIATE_MLOCK(m_localInboxMutex);
@@ -549,9 +559,7 @@ namespace bmwrapper {
         }
         mlock.unlock();
         return false;
-    } // By default this marks a given message as read or not, not all API's will support this and should thus return false.
-    
-    
+    }
     
     
     bool BitMessage::sendMail(NetworkMail message){
@@ -598,7 +606,6 @@ namespace bmwrapper {
             return subscriptionList;
         }
         
-        // We should never reach here.
         mlock.unlock();
         return std::vector<std::pair<std::string, std::string> >();
         
@@ -632,7 +639,8 @@ namespace bmwrapper {
     bool BitMessage::startQueue(){
         
         if(bm_queue != nullptr){
-            if(bm_queue->start())   // Should also have checks to determine if queue was already started.
+            // Will automatically check to determine if queue was already started to avoid issues.
+            if(bm_queue->start())
                 return true;
             else{
                 std::cerr << "If you are seeing this, something went terribly wrong: bm_queue is a nullptr" << std::endl;
@@ -646,7 +654,8 @@ namespace bmwrapper {
     bool BitMessage::stopQueue(){
         
         if(bm_queue != nullptr){
-            if(bm_queue->stop())   // Should also have checks to determine if queue was already stopped.
+            // Will automatically check to determine if queue was already stopped.
+            if(bm_queue->stop())
                 return true;
             else
                 return false;
@@ -674,8 +683,6 @@ namespace bmwrapper {
             return 0;
         }
     }
-    
-    
     
     
     
@@ -713,11 +720,11 @@ namespace bmwrapper {
         bool parsesuccess = reader.parse( ValueString(result.second), root );
         if ( !parsesuccess )
         {
-            std::cerr  << "Failed to parse inbox" << std::endl; //<< reader.getFormatedErrorMessages();
+            std::cerr  << "Failed to parse inbox" << std::endl; // << reader.getFormatedErrorMessages();
         }
         
         const Json::Value inboxMessages = root["inboxMessages"];
-        for ( unsigned int index = 0; index < inboxMessages.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < inboxMessages.size(); ++index ){
             
             // We need to sanitize our string, or else it will get cut off because of the newlines.
             std::string dirtyMessage = inboxMessages[index].get("message", "").asString();
@@ -730,9 +737,10 @@ namespace bmwrapper {
             
         }
         
-        INSTANTIATE_MLOCK(m_localInboxMutex); // Lock so that we dont have a race condition.
-        // Populate our local inbox.
+        // Lock so that we dont have a race condition.
+        INSTANTIATE_MLOCK(m_localInboxMutex);
         
+        // Populate our local inbox.
         m_localInbox.clear();
         m_localUnformattedInbox.clear();
         for(unsigned int x=0; x<inbox.size(); x++){
@@ -741,8 +749,12 @@ namespace bmwrapper {
             
             m_localInbox.push_back(l_mail);
         }
-        std::reverse(m_localInbox.begin(), m_localInbox.end());  // New messages at the front
-        mlock.unlock(); // Release our lock so that others can access the inbox
+        
+        // New messages at the front
+        std::reverse(m_localInbox.begin(), m_localInbox.end());
+        
+        // Release our lock so that others can access the inbox
+        mlock.unlock();
         
     }
     
@@ -759,16 +771,12 @@ namespace bmwrapper {
         if(result.first == false){
             std::cerr << "Error: BitMessage getInboxMessageByID failed" << std::endl;
             setServerAlive(false);
-            //BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
-            //return message;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                //BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
-                //return message;
             }
         }
         
@@ -781,7 +789,6 @@ namespace bmwrapper {
         {
             std::cerr  << "Failed to parse inbox" << std::endl; //reader.getFormatedErrorMessages();
             BitInboxMessage message("", "", "", base64(""), base64(""), 0, 0, false);
-            //return message;
         }
         
         const Json::Value inboxMessage = root["inboxMessage"];
@@ -792,8 +799,6 @@ namespace bmwrapper {
         
         
         BitInboxMessage message(inboxMessage[0u].get("msgid", "").asString(), inboxMessage[0u].get("toAddress", "").asString(), inboxMessage[0u].get("fromAddress", "").asString(), base64(inboxMessage[0u].get("subject", "").asString(), true), cleanMessage, inboxMessage[0u].get("encodingType", 0).asInt(), std::atoi(inboxMessage[0u].get("receivedTime", 0).asString().c_str()), inboxMessage[0u].get("read", false).asBool());
-        
-        //return message;
         
     }
     
@@ -827,7 +832,7 @@ namespace bmwrapper {
         }
         
         const Json::Value sentMessages = root["sentMessages"];
-        for ( unsigned int index = 0; index < sentMessages.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < sentMessages.size(); ++index ){
             
             // We need to sanitize our string, or else it will get cut off because of the newlines.
             std::string dirtyMessage = sentMessages[index].get("message", "").asString();
@@ -847,23 +852,14 @@ namespace bmwrapper {
             outbox.push_back(message);
         }
         
-        INSTANTIATE_MLOCK(m_localOutboxMutex); // Lock so that we dont have a race condition.
+        // Lock so that we dont have a race condition.
+        INSTANTIATE_MLOCK(m_localOutboxMutex);
+
         // Populate our local outbox.
-        
         m_localOutbox.clear();
         m_localUnformattedOutbox.clear();
         for(unsigned int x=0; x<outbox.size(); x++){
             m_localUnformattedOutbox.push_back(outbox.at(x));
-            
-            //        NetworkMail(std::string from="",
-            //                    std::string to="",
-            //                    std::string subject="",
-            //                    std::string message="",
-            //                    bool isRead=false,
-            //                    std::string messageID="",
-            //                    std::time_t received=0,
-            //                    std::time_t sent=0)
-            
             _SharedPtr<NetworkMail> l_mail( new NetworkMail(outbox.at(x).getFromAddress(),
                                                             outbox.at(x).getToAddress(),
                                                             outbox.at(x).getSubject().decoded(),
@@ -875,9 +871,12 @@ namespace bmwrapper {
             
             m_localOutbox.push_back(l_mail);
         }
-        std::reverse(m_localOutbox.begin(), m_localOutbox.end());  // New messages at the front
-        mlock.unlock(); // Release our lock so that others can access the outbox
         
+        // New messages at the front
+        std::reverse(m_localOutbox.begin(), m_localOutbox.end());
+        
+        // Release our lock so that others can access the outbox
+        mlock.unlock();
     }
     
     BitSentMessage BitMessage::getSentMessageByID(std::string msgID){
@@ -1087,7 +1086,6 @@ namespace bmwrapper {
     
     // Message Management
     
-    
     void BitMessage::sendMessage(std::string fromAddress, std::string toAddress, base64 subject, base64 message, int encodingType){
         
         Parameters params;
@@ -1103,19 +1101,14 @@ namespace bmwrapper {
         if(result.first == false){
             std::cerr << "Error: BitMessage sendMessage failed" << std::endl;
             setServerAlive(false);
-            //return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                //return "";
             }
         }
-        
-        //return std::string(ValueString(result.second));
-        
     }
     
     
@@ -1163,14 +1156,12 @@ namespace bmwrapper {
         if(result.first == false){
             std::cerr << "Error: BitMessage listSubscriptions failed" << std::endl;
             setServerAlive(false);
-            //return subscriptionList;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                //return subscriptionList;
             }
         }
         
@@ -1181,11 +1172,10 @@ namespace bmwrapper {
         if ( !parsesuccess )
         {
             std::cerr  << "Failed to parse subscription list" << std::endl; //reader.getFormatedErrorMessages();
-            //return subscriptionList;
         }
         
         const Json::Value subscriptions = root["subscriptions"];
-        for ( unsigned int index = 0; index < subscriptions.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < subscriptions.size(); ++index ){
             
             std::string dirtyLabel = subscriptions[index].get("label", "").asString();
             dirtyLabel.erase(std::remove(dirtyLabel.begin(), dirtyLabel.end(), '\n'), dirtyLabel.end());
@@ -1373,7 +1363,7 @@ namespace bmwrapper {
         }
         
         const Json::Value addresses = root["addresses"];
-        for ( unsigned int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < addresses.size(); ++index ){
             BitMessageIdentity entry(base64(addresses[index].get("label", "").asString(), true), addresses[index].get("address", "").asString(), addresses[index].get("stream", 0).asInt(), addresses[index].get("enabled", false).asBool(), addresses[index].get("chan", false).asBool());
             
             responses.push_back(entry);
@@ -1401,14 +1391,12 @@ namespace bmwrapper {
         if(result.first == false){
             std::cerr << "Error: BitMessage createRandomAddress failed" << std::endl;
             setServerAlive(false);
-            //return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                //return "";
             }
         }
         
@@ -1438,14 +1426,12 @@ namespace bmwrapper {
         if(result.first == false){
             std::cerr << "Error: BitMessage createDeterministicAddresses failed" << std::endl;
             setServerAlive(false);
-            //return addressList;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                //return addressList;
             }
         }
         
@@ -1456,7 +1442,6 @@ namespace bmwrapper {
         if ( !parsesuccess )
         {
             std::cerr  << "Failed to parse address list" << std::endl; //reader.getFormatedErrorMessages();
-            //return addressList;
         }
         
         const Json::Value addresses = root["addresses"];
@@ -1532,7 +1517,7 @@ namespace bmwrapper {
         }
         
         const Json::Value addresses = root["addresses"];
-        for ( unsigned int index = 0; index < addresses.size(); ++index ){  // Iterates over the sequence elements.
+        for ( unsigned int index = 0; index < addresses.size(); ++index ){
             
             std::string dirtyLabel = addresses[index].get("label", "").asString();
             dirtyLabel.erase(std::remove(dirtyLabel.begin(), dirtyLabel.end(), '\n'), dirtyLabel.end());
@@ -1618,19 +1603,14 @@ namespace bmwrapper {
         if(result.first == false){
             std::cerr << "Error: BitMessage deleteAddress " << address << " failed" << std::endl;
             setServerAlive(false);
-            //return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                //return false;
             }
         }
-        
-        //return true;
-        
     }
     
     
@@ -1693,9 +1673,6 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("helloWorld", params);
         
         if(result.first == false){
-            // No error reporting here for the time being, as this is a core piece of the checkAlive utility, this could
-            // Spit out a lot of extraneous information otherwise.
-            //std::cerr << "Error Accessing BitMessage API" << std::endl;
             setServerAlive(false);
             return "";
         }
@@ -1831,11 +1808,11 @@ namespace bmwrapper {
     
     void BitMessage::initializeUserData(){
         
-        listAddresses(); // Populates Local Owned Addresses
-        listAddressBookEntries();  // Populates address book data, for remote users we have addresses for.
-        getAllInboxMessages();
-        getAllSentMessages();
-        listSubscriptions();
+        listAddresses(); // Populates Local Owned Addresses.
+        listAddressBookEntries();  // Populates address book data.
+        getAllInboxMessages(); // Populates local Inbox object.
+        getAllSentMessages(); // Populates local Outbox (sent messages) object.
+        listSubscriptions(); // Populates local subscriptions list.
         
     }
     

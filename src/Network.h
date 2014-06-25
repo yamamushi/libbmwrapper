@@ -96,6 +96,7 @@ public:
     std::string getCommstring() { return m_commstring; }
     
     virtual bool accessible(){return false;}
+    virtual bool pollStatus(){return false;}
     
     virtual int  modulesLoaded(){return NetCounter::loaded;}
     virtual int  modulesAlive(){return NetCounter::alive;}
