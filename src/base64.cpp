@@ -27,7 +27,9 @@
 
 /*
  
- NOTICE - This source has been modified from the original for inclusion in the "base64" class as part of the vp-auditservice project.
+ NOTICE - This source has been modified from the original for inclusion in the "base64" class as part of the libbmwrapper project.
+ 
+ Please visit http://www.adp-gmbh.ch/cpp/common/base64.html for more information about the original source code.
  
  */
 

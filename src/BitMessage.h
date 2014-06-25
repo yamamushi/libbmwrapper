@@ -8,7 +8,7 @@
 #include <ctime>
 #include "Network.h"
 #include "TR1_Wrapper.hpp"
-#include "Threading.h"
+#include "BMThreading.h"
 #include "base64.h"
 #include "XmlRPC.h"
 #include "BitMessageQueue.h"

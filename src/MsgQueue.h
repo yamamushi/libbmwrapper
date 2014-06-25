@@ -4,7 +4,7 @@
 
 #include <queue>
 
-#include "Threading.h"
+#include "BMThreading.h"
 
 namespace bmwrapper {
 
