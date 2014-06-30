@@ -4,13 +4,14 @@
 
 #include "BitMessage.h"
 #include <json/json.h>
-
+#include<boost/tokenizer.hpp>
 
 #include <string>
 #include <iostream>
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <functional>
 
 #ifndef OT_USE_TR1
 #include <chrono>
@@ -20,9 +21,6 @@
 #include <boost/thread.hpp>
 #endif
 
-#include <functional>
-
-#include<boost/tokenizer.hpp>
 
 namespace bmwrapper {
     
@@ -731,7 +729,14 @@ namespace bmwrapper {
             dirtyMessage.erase(std::remove(dirtyMessage.begin(), dirtyMessage.end(), '\n'), dirtyMessage.end());
             base64 cleanMessage(dirtyMessage, true);
             
-            BitInboxMessage message(inboxMessages[index].get("msgid", "").asString(), inboxMessages[index].get("toAddress", "").asString(), inboxMessages[index].get("fromAddress", "").asString(), base64(inboxMessages[index].get("subject", "").asString(), true), cleanMessage, inboxMessages[index].get("encodingType", 0).asInt(), std::atoi(inboxMessages[index].get("receivedTime", 0).asString().c_str()), inboxMessages[index].get("read", false).asBool());
+            BitInboxMessage message(inboxMessages[index].get("msgid", "").asString(),
+                                    inboxMessages[index].get("toAddress", "").asString(),
+                                    inboxMessages[index].get("fromAddress", "").asString(),
+                                    base64(inboxMessages[index].get("subject", "").asString(), true),
+                                    cleanMessage, inboxMessages[index].get("encodingType", 0).asInt(),
+                                    std::atoi(inboxMessages[index].get("receivedTime", 0).asString().c_str()),
+                                    inboxMessages[index].get("read", false).asBool()
+                                    );
             
             inbox.push_back(message);
             
@@ -743,9 +748,19 @@ namespace bmwrapper {
         // Populate our local inbox.
         m_localInbox.clear();
         m_localUnformattedInbox.clear();
+        
         for(unsigned int x=0; x<inbox.size(); x++){
+            
             m_localUnformattedInbox.push_back(inbox.at(x));
-            _SharedPtr<NetworkMail> l_mail( new NetworkMail(inbox.at(x).getFromAddress(), inbox.at(x).getToAddress(), inbox.at(x).getSubject().decoded(), inbox.at(x).getMessage().decoded(), inbox.at(x).getRead(), inbox.at(x).getMessageID(), inbox.at(x).getReceivedTime() ));
+            
+            _SharedPtr<NetworkMail> l_mail( new NetworkMail(inbox.at(x).getFromAddress(),
+                                                            inbox.at(x).getToAddress(),
+                                                            inbox.at(x).getSubject().decoded(),
+                                                            inbox.at(x).getMessage().decoded(),
+                                                            inbox.at(x).getRead(),
+                                                            inbox.at(x).getMessageID(),
+                                                            inbox.at(x).getReceivedTime())
+                                           );
             
             m_localInbox.push_back(l_mail);
         }
@@ -798,7 +813,14 @@ namespace bmwrapper {
         base64 cleanMessage(dirtyMessage, true);
         
         
-        BitInboxMessage message(inboxMessage[0u].get("msgid", "").asString(), inboxMessage[0u].get("toAddress", "").asString(), inboxMessage[0u].get("fromAddress", "").asString(), base64(inboxMessage[0u].get("subject", "").asString(), true), cleanMessage, inboxMessage[0u].get("encodingType", 0).asInt(), std::atoi(inboxMessage[0u].get("receivedTime", 0).asString().c_str()), inboxMessage[0u].get("read", false).asBool());
+        BitInboxMessage message(inboxMessage[0u].get("msgid", "").asString(),
+                                inboxMessage[0u].get("toAddress", "").asString(),
+                                inboxMessage[0u].get("fromAddress", "").asString(),
+                                base64(inboxMessage[0u].get("subject", "").asString(), true),
+                                cleanMessage, inboxMessage[0u].get("encodingType", 0).asInt(),
+                                std::atoi(inboxMessage[0u].get("receivedTime", 0).asString().c_str()),
+                                inboxMessage[0u].get("read", false).asBool()
+                                );
         
     }
     
@@ -847,7 +869,8 @@ namespace bmwrapper {
                                    sentMessages[index].get("encodingType", 0).asInt(),
                                    sentMessages[index].get("lastActionTime", 0).asInt(),
                                    sentMessages[index].get("status", false).asString(),
-                                   sentMessages[index].get("ackData", false).asString());
+                                   sentMessages[index].get("ackData", false).asString()
+                                   );
             
             outbox.push_back(message);
         }
@@ -867,7 +890,8 @@ namespace bmwrapper {
                                                             true,
                                                             outbox.at(x).getMessageID(),
                                                             0,
-                                                            outbox.at(x).getLastActionTime()));
+                                                            outbox.at(x).getLastActionTime())
+                                           );
             
             m_localOutbox.push_back(l_mail);
         }
@@ -927,7 +951,8 @@ namespace bmwrapper {
                                sentMessage[0u].get("encodingType", 0).asInt(),
                                sentMessage[0u].get("lastActionTime", 0).asInt(),
                                sentMessage[0u].get("status", false).asString(),
-                               sentMessage[0u].get("ackData", false).asString());
+                               sentMessage[0u].get("ackData", false).asString()
+                               );
         
         return message;
         
@@ -974,7 +999,16 @@ namespace bmwrapper {
         base64 cleanMessage(dirtyMessage, true);
         
         
-        BitSentMessage message(sentMessage[0u].get("msgid", "").asString(), sentMessage[0u].get("toAddress", "").asString(), sentMessage[0u].get("fromAddress", "").asString(), base64(sentMessage[0u].get("subject", "").asString(), true), cleanMessage, sentMessage[0u].get("encodingType", 0).asInt(), sentMessage[0u].get("lastActionTime", 0).asInt(), sentMessage[0u].get("status", false).asString(), sentMessage[0u].get("ackData", false).asString());
+        BitSentMessage message(sentMessage[0u].get("msgid", "").asString(),
+                               sentMessage[0u].get("toAddress", "").asString(),
+                               sentMessage[0u].get("fromAddress", "").asString(),
+                               base64(sentMessage[0u].get("subject", "").asString(), true),
+                               cleanMessage,
+                               sentMessage[0u].get("encodingType", 0).asInt(),
+                               sentMessage[0u].get("lastActionTime", 0).asInt(),
+                               sentMessage[0u].get("status", false).asString(),
+                               sentMessage[0u].get("ackData", false).asString()
+                               );
         
         return message;
         
@@ -1021,10 +1055,12 @@ namespace bmwrapper {
                                    sentMessages[index].get("toAddress", "").asString(),
                                    sentMessages[index].get("fromAddress", "").asString(),
                                    base64(sentMessages[index].get("subject", "").asString(), true),
-                                   cleanMessage, sentMessages[index].get("encodingType", 0).asInt(),
+                                   cleanMessage,
+                                   sentMessages[index].get("encodingType", 0).asInt(),
                                    std::atoi(sentMessages[index].get("lastActionTime", 0).asString().c_str()),
                                    sentMessages[index].get("status", false).asString(),
-                                   sentMessages[index].get("ackData", false).asString());
+                                   sentMessages[index].get("ackData", false).asString()
+                                   );
             
             outbox.push_back(message);
             
@@ -1364,7 +1400,12 @@ namespace bmwrapper {
         
         const Json::Value addresses = root["addresses"];
         for ( unsigned int index = 0; index < addresses.size(); ++index ){
-            BitMessageIdentity entry(base64(addresses[index].get("label", "").asString(), true), addresses[index].get("address", "").asString(), addresses[index].get("stream", 0).asInt(), addresses[index].get("enabled", false).asBool(), addresses[index].get("chan", false).asBool());
+            BitMessageIdentity entry(base64(addresses[index].get("label", "").asString(), true),
+                                     addresses[index].get("address", "").asString(),
+                                     addresses[index].get("stream", 0).asInt(),
+                                     addresses[index].get("enabled", false).asBool(),
+                                     addresses[index].get("chan", false).asBool()
+                                     );
             
             responses.push_back(entry);
             
