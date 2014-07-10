@@ -25,7 +25,7 @@
 namespace bmwrapper {
     
     
-    BitMessage::BitMessage(std::string commstring) : NetworkModule(commstring) {
+    BitMessage::BitMessage(std::string commstring) : NetworkModule(commstring, ModuleType::BITMESSAGE) {
         
         // Pass our config string to be parsed locally
         parseCommstring(commstring);

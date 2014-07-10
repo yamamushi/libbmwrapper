@@ -187,7 +187,7 @@ namespace bmwrapper{
         bool accessible();
         bool pollStatus();
         
-        std::string moduleType(){return "BitMessage";}
+        ModuleType moduleType(){return ModuleType::BITMESSAGE;}
         
         bool createAddress(std::string label="");
         bool createDeterministicAddress(std::string key, std::string label="");
