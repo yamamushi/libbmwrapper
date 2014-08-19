@@ -152,9 +152,9 @@ public:
     
     // Broadcasting Functions
     
-    virtual bool createBroadcastAddress(){return false;}
-    virtual bool broadcastOnAddress(std::string address){return false;}
-    virtual bool subscribeToAddress(std::string address){return false;}
+    virtual bool createBroadcastAddress(std::string label){return false;}
+    virtual bool broadcastOnAddress(std::string toAddress, std::string subject, std::string message){return false;}
+    virtual bool subscribeToAddress(std::string address, std::string label){return false;}
     
     // Functions for importing/exporting from BitMessage server addressbook
     

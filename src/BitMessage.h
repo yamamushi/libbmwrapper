@@ -229,9 +229,27 @@ namespace bmwrapper{
         bool markRead(std::string messageID, bool read=true);
         bool sendMail(NetworkMail message);
         
+        // Broadcasting Functions
+        
         bool publishSupport(){return true;}
         std::vector<std::pair<std::string,std::string> > getSubscriptions();
         bool refreshSubscriptions();
+
+        bool createBroadcastAddress(std::string label);
+        bool broadcastOnAddress(std::string toAddress, std::string subject, std::string message);
+        bool subscribeToAddress(std::string address, std::string label);
+        
+        // Functions for importing/exporting from BitMessage server addressbook
+        
+        std::string getLabel(std::string address);
+        bool setLabel(std::string label, std::string address);
+        std::string getAddressFromLabel(std::string label);
+        bool addContact(std::string label, std::string address);
+        
+        
+        // Binary Streaming Functions
+        
+        
         
         
         // Message Queue Interaction
@@ -269,16 +287,15 @@ namespace bmwrapper{
         
         void sendMessage(std::string fromAddress, std::string toAddress, base64 subject, base64 message, int encodingType=2);
         
-        std::string sendBroadcast(std::string fromAddress, base64 subject, base64 message, int encodingType=2);
-        std::string sendBroadcast(std::string fromAddress, std::string subject, std::string message, int encodingType=2){return sendBroadcast(fromAddress, base64(subject), base64(message), encodingType);}
+        void sendBroadcast(std::string toAddress, base64 subject, base64 message, int encodingType=2);
+        //std::string sendBroadcast(std::string fromAddress, std::string subject, std::string message, int encodingType=2){return sendBroadcast(fromAddress, base64(subject), base64(message), encodingType);}
         
         
         // Subscription Management
         
         void listSubscriptions();
         
-        bool addSubscription(std::string address, base64 label);
-        bool addSubscription(std::string address, std::string label){return addSubscription(address, base64(label));}
+        void addSubscription(std::string address, base64 label);
         
         bool deleteSubscription(std::string address);
         

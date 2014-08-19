@@ -630,6 +630,133 @@ namespace bmwrapper {
     
     
     
+    
+    // Broadcasting Functions
+    
+    bool BitMessage::createBroadcastAddress(std::string label){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
+        try{
+            
+            if(label == ""){
+                std::cerr << "Will Not Create Address with Blank Label" << std::endl;
+                return false;
+            }
+            
+            if(createAddress(label)){
+                
+                std::string broadcastAddress, broadcastLabel;
+                
+                bool found = false;
+                while(!found){
+
+                    // Sleep for a moment so we don't run endlessly needlessly
+                    sleep(10);
+                    std::vector<std::pair<std::string, std::string> > addressBook = getLocalAddresses();
+
+                    for(unsigned int x = 0; x < addressBook.size(); x++){
+                        std::cout << addressBook.at(x).first << std::endl;
+                        if(addressBook.at(x).first == label){
+                            broadcastLabel = addressBook.at(x).first;
+                            broadcastAddress = addressBook.at(x).second;
+                            
+                            
+                            
+                            found = true;
+                        }
+                    }
+                    
+                }
+                if(!subscribeToAddress(broadcastAddress, broadcastLabel)){
+                    std::cerr << "Error Subscribing to: " + broadcastAddress << std::endl;
+                    return false;
+                }
+                else{
+                    std::cerr << "Subscribed to: " + broadcastAddress << std::endl;
+                }
+                
+                std::cout << "Address for Label: " + label + " = " + broadcastAddress << std::endl;
+                return true;
+
+            }
+            else{
+                std::cerr << "Error Creating Address With Label: " + label << std::endl;
+                return false;
+            }
+            
+        }
+        
+        catch(...){
+            return false;
+        }
+        
+        return false;
+        
+    }
+    
+    
+    
+    bool BitMessage::broadcastOnAddress(std::string toAddress, std::string subject, std::string message){
+        
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
+        try{
+            OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::sendBroadcast, this, toAddress, base64(subject), base64(message), 2);
+            bm_queue->addToQueue(command);
+            return true;
+        }
+        
+        catch(...){
+            return false;
+        }
+        
+        return false;
+    }
+    
+    
+    
+    bool BitMessage::subscribeToAddress(std::string address, std::string label){
+    
+        if(!accessible()){
+            checkAlive();
+            return false;
+        }
+        
+        try{
+            OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::addSubscription, this, address, base64(label));
+            bm_queue->addToQueue(command);
+            return true;
+        }
+        
+        catch(...){
+            return false;
+        }
+        
+        return false;
+    
+    }
+    
+    // Functions for importing/exporting from BitMessage server addressbook
+    
+    std::string BitMessage::getLabel(std::string address){return "";}
+    bool BitMessage::setLabel(std::string label, std::string address){return false;}
+    std::string BitMessage::getAddressFromLabel(std::string label){return "";}
+    
+    bool BitMessage::addContact(std::string label, std::string address){return false;}
+    
+    
+    // Binary Streaming Functions
+    
+    
+    
+    
     /*
      * Message Queue Interaction
      */
@@ -1148,7 +1275,7 @@ namespace bmwrapper {
     }
     
     
-    std::string BitMessage::sendBroadcast(std::string fromAddress, base64 subject, base64 message, int encodingType){
+    void BitMessage::sendBroadcast(std::string fromAddress, base64 subject, base64 message, int encodingType){
         
         Parameters params;
         params.push_back(ValueString(fromAddress));
@@ -1162,18 +1289,18 @@ namespace bmwrapper {
         if(result.first == false){
             std::cerr << "Error: BitMessage sendBroadcast failed" << std::endl;
             setServerAlive(false);
-            return "";
+            //return "";
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                return "";
+                //return "";
             }
         }
         
-        return std::string(ValueString(result.second));
+        //return std::string(ValueString(result.second));
         
     }
     
@@ -1229,7 +1356,7 @@ namespace bmwrapper {
     }
     
     
-    bool BitMessage::addSubscription(std::string address, base64 label){
+    void BitMessage::addSubscription(std::string address, base64 label){
         
         Parameters params;
         params.push_back(ValueString(address));
@@ -1239,20 +1366,20 @@ namespace bmwrapper {
         XmlResponse result = m_xmllib->run("addSubscription", params);
         
         if(result.first == false){
-            std::cerr << "Error: BitMessage createChan failed" << std::endl;
+            std::cerr << "Error: BitMessage addSubscription failed" << std::endl;
             setServerAlive(false);
-            return false;
+            //return false;
         }
         else if(result.second.type() == xmlrpc_c::value::TYPE_STRING){
             std::size_t found;
             found=std::string(ValueString(result.second)).find("API Error");
             if(found!=std::string::npos){
                 std::cerr << std::string(ValueString(result.second)) << std::endl;
-                return false;
+                //return false;
             }
         }
         
-        return true;
+        //return true;
         
     }
     
