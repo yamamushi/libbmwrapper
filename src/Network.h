@@ -14,6 +14,20 @@
 
 #include "TR1_Wrapper.hpp"
 
+
+
+
+enum class ModuleType {
+    
+    ZMQ,
+    BITMESSAGE,
+    I2P,
+    DHT,
+    NOS
+    
+};
+
+
 // A counter Template to count the number of modules loaded or alive
 
 template <typename T>
@@ -91,16 +105,17 @@ class NetworkModule : public NetCounter<NetworkModule> {
     
 public:
     
-    NetworkModule(std::string commstring) : m_commstring(commstring) {}
+    NetworkModule(std::string commstring, ModuleType modtype) : m_commstring(commstring), m_modtype(modtype){}
     
     std::string getCommstring() { return m_commstring; }
     
     virtual bool accessible(){return false;}
+    virtual bool pollStatus(){return false;}
     
     virtual int  modulesLoaded(){return NetCounter::loaded;}
     virtual int  modulesAlive(){return NetCounter::alive;}
     
-    virtual std::string moduleType(){return "";}
+    virtual ModuleType moduleType(){return m_modtype;}
     
     virtual bool createAddress(std::string label=""){return false;}
     virtual bool createDeterministicAddress(std::string key, std::string label=""){return false;}
@@ -137,9 +152,9 @@ public:
     
     // Broadcasting Functions
     
-    virtual bool createBroadcastAddress(){return false;}
-    virtual bool broadcastOnAddress(std::string address){return false;}
-    virtual bool subscribeToAddress(std::string address){return false;}
+    virtual bool createBroadcastAddress(std::string label){return false;}
+    virtual bool broadcastOnAddress(std::string toAddress, std::string subject, std::string message){return false;}
+    virtual bool subscribeToAddress(std::string address, std::string label){return false;}
     
     // Functions for importing/exporting from BitMessage server addressbook
     
@@ -165,5 +180,6 @@ public:
 private:
     
     std::string m_commstring;
+    ModuleType m_modtype;
     
 };

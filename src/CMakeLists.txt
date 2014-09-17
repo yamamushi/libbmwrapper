@@ -39,7 +39,7 @@ install(FILES BitMessage.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper
 install(FILES base64.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES BitMessageQueue.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES MsgQueue.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
-install(FILES Threading.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
+install(FILES BMThreading.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES TR1_Wrapper.hpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES XmlRPC.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 

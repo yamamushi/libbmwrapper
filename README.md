@@ -9,3 +9,4 @@ A threaded C++ wrapper for communicating with the PyBitMessage API service.
  cd build
  cmake ..
  make
+ make install
