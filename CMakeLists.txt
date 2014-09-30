@@ -2,6 +2,22 @@ cmake_minimum_required(VERSION 2.8)
 
 project(LIBBMWRAPPER)
 
+find_package(Git)
+if(GIT_FOUND)
+    execute_process(COMMAND git "describe" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" VERSION_MAJOR "${GIT_VERSION}")
+    string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${GIT_VERSION}")
+    string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_BUGFIX "${GIT_VERSION}")
+    string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-(.*)" "\\1" VERSION_SHA1 "${GIT_VERSION}")
+    if("${VERSION_SHA1}" STREQUAL "")
+        set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUGFIX}")
+    else()
+        set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUGFIX}-${VERSION_SHA1}")
+    endif()
+else()
+  message(FATAL_ERROR "Git not found.")
+endif()
+
 #-----------------------------------------------------------------------------
 # Options for building
 
@@ -18,7 +34,6 @@ endif()
 message(STATUS "CMake version:   ${CMAKE_VERSION}")
 message(STATUS "System:          ${CMAKE_SYSTEM}")
 message(STATUS "Processor:       ${CMAKE_SYSTEM_PROCESSOR}")
-
 message(STATUS "Verbose:         ${LIBBMWRAPPER_BUILD_VERBOSE}")
 
 
@@ -68,6 +83,11 @@ if(UNIX AND NOT APPLE)
   list(APPEND LIBBMWRAPPER_SYSTEM_LIBRARIES rt)
   list(APPEND LIBBMWRAPPER_SYSTEM_LIBRARIES dl)
 endif()
+
+#-----------------------------------------------------------------------------
+# Get submodules
+
+execute_process(COMMAND git "submodule" "update" "--init" "--recursive" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 
 #-----------------------------------------------------------------------------
