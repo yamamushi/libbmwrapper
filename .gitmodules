@@ -1,6 +1,6 @@
 [submodule "deps/jsoncpp"]
 	path = deps/jsoncpp
-	url = https://github.com/monetas/JsonCpp.git
+	url = https://github.com/open-source-parsers/jsoncpp.git
 [submodule "deps/gtest"]
 	path = deps/gtest
-	url = https://github.com/monetas/gtest.git
+	url = https://github.com/open-transactions/gtest.git
