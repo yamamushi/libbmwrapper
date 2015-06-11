@@ -4,3 +4,6 @@
 [submodule "deps/jsoncpp"]
 	path = deps/jsoncpp
 	url = https://github.com/open-source-parsers/jsoncpp
+[submodule "deps/fecpp"]
+	path = deps/fecpp
+	url = git@github.com:yamamushi/fecpp.git
