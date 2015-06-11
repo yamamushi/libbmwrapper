@@ -18,6 +18,7 @@
 #include <thread>
 #define OT_THREAD std::thread
 #define OT_MUTEX(MT) std::mutex MT
+#define OT_THREAD_SLEEP(DURA) std::this_thread::sleep_for(DURA)
 #define INSTANTIATE_MLOCK(MT) std::unique_lock<std::mutex>mlock(MT)
 #define CONDITION_VARIABLE(VAR) std::condition_variable VAR
 #define OT_ATOMIC(THE_ATOM) std::atomic<bool> THE_ATOM
@@ -36,6 +37,7 @@
 #include <condition_variable>
 #include <functional>
 #define OT_THREAD std::thread
+#define OT_THREAD_SLEEP(DURA) std::this_thread::sleep_for(DURA)
 #define OT_MUTEX(MT) std::mutex MT
 #define INSTANTIATE_MLOCK(MT) std::unique_lock<std::mutex>mlock(MT)
 #define CONDITION_VARIABLE(VAR) std::condition_variable VAR
@@ -55,6 +57,7 @@
 #include <boost/thread/mutex.hpp>
 #include <tr1/functional>
 #define OT_THREAD boost::thread
+#define OT_THREAD_SLEEP(DURA) boost::this_thread::sleep_for(DURA)
 #define OT_MUTEX(MT) boost::mutex MT
 #define INSTANTIATE_MLOCK(MT) boost::unique_lock<boost::mutex>mlock(MT)
 #define CONDITION_VARIABLE(VAR) boost::condition_variable VAR

@@ -69,6 +69,20 @@ namespace bmwrapper {
     }
     
     
+    void BitMessageQueue::run(){
+        
+        while(!m_stop){
+            if(!parseNextMessage()){
+                std::chrono::seconds dura( 1 );
+                OT_THREAD_SLEEP( dura );
+            }
+        }
+        
+    
+    
+    } // Obviously this will be our message parsing loop
+
+    
     
     
     bool BitMessageQueue::parseNextMessage(){

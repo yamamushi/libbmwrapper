@@ -30,7 +30,7 @@ namespace bmwrapper {
     protected:
         
         OT_ATOMIC(m_stop);
-        void run(){ while(!m_stop){parseNextMessage();} } // Obviously this will be our message parsing loop
+        void run();
         
     private:
         
