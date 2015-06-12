@@ -1,2 +1,3 @@
 add_subdirectory(jsoncpp)
-#add_subdirectory(gtest)
+add_subdirectory(fecpp)
+add_subdirectory(gtest)

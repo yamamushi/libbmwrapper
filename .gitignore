@@ -62,3 +62,6 @@ Temporary Items
 
 # Build directories
 build/
+
+# CLion directories
+.idea/*
