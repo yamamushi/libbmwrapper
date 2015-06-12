@@ -4,7 +4,7 @@
 
 #include "bmfec.h"
 
-namespace bmfec {
+namespace bmwrapper {
 
 void write_zfec_header(std::ostream &output,
                        size_t n, size_t k, size_t pad_bytes, size_t share_num) {

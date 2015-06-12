@@ -1,17 +1,29 @@
-//
-// Created by Jonathan Rumion on 6/12/15.
-//
+/*
+ Created by Jonathan Rumion on 6/12/15.
+
+ This is a set of classes and functions for working with 'zfec' split data.
+
+ Whether for binary data (images, music, programs, etc), or just plain old string data that is too
+ big for a single BitMessage message (256kb).
+
+
+
+*/
 
 #ifndef LIBBMWRAPPER_BMFEC_H
 #define LIBBMWRAPPER_BMFEC_H
 
 #include "base64.h"
+#include "sha256.h"
+
 #include <fecpp.h>
 #include <string>
 #include <fstream>
 #include <sstream>
 
-namespace bmfec {
+
+
+namespace bmwrapper {
 
 size_t log2_ceil(size_t n) {
     size_t i = 0;
@@ -26,6 +38,18 @@ template<typename T>
 inline fecpp::byte get_byte(size_t byte_num, T input) {
     return (input >> ((sizeof(T) - 1 - (byte_num & (sizeof(T) - 1))) << 3));
 }
+
+
+struct ZfecChunk {
+
+    std::string m_sha256sum;
+    int m_K;
+    int m_N;
+    base64 m_data;
+
+};
+
+
 
 void write_zfec_header(std::ostream &output, size_t n, size_t k, size_t pad_bytes, size_t share_num);
 
@@ -52,12 +76,14 @@ private:
     std::vector<std::ofstream *> outputs;
 };
 
+
+
+
 class BmFEC {
 
 public:
 
     BmFEC(int k, int n){};
-
 
 private:
 

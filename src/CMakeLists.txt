@@ -6,6 +6,7 @@ set(SRC
   XmlRPC.cpp
   base64.cpp
   bmfec.cpp
+  sha256.cpp
 )
 
 include_directories(SYSTEM
@@ -46,6 +47,8 @@ install(FILES BMThreading.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrappe
 install(FILES TR1_Wrapper.hpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES XmlRPC.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES bmfec.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
+# install(FILES sha256.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
+
 
 
 INSTALL(TARGETS ${NAME}-static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
