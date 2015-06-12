@@ -5,10 +5,12 @@ set(SRC
   BitMessageQueue.cpp
   XmlRPC.cpp
   base64.cpp
+  bmfec.cpp
 )
 
 include_directories(SYSTEM
   ${PROJECT_SOURCE_DIR}/deps/jsoncpp/include
+  ${PROJECT_SOURCE_DIR}/deps/fecpp/src
 )
 
 link_directories(
@@ -21,6 +23,7 @@ target_link_libraries(${NAME}
   ${Boost_LIBRARIES}
   ${XMLRPC_LIBRARIES}
   jsoncpp
+  fecpp
   ${LIBBMWRAPPER_SYSTEM_LIBRARIES}
 )
 
@@ -42,6 +45,7 @@ install(FILES MsgQueue.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES BMThreading.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES TR1_Wrapper.hpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES XmlRPC.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
+install(FILES bmfec.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 
 
 INSTALL(TARGETS ${NAME}-static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

@@ -286,6 +286,8 @@ namespace bmwrapper{
         // Message Management
         
         void sendMessage(std::string fromAddress, std::string toAddress, base64 subject, base64 message, int encodingType=2);
+
+        void sendBinaryMessage(std::string fromAddress, std::string toAddress, base64 subject, std::string path, int encodingType=2);
         
         void sendBroadcast(std::string toAddress, base64 subject, base64 message, int encodingType=2);
         //std::string sendBroadcast(std::string fromAddress, std::string subject, std::string message, int encodingType=2){return sendBroadcast(fromAddress, base64(subject), base64(message), encodingType);}
@@ -348,8 +350,12 @@ namespace bmwrapper{
         // Extra BitMessage Options (some of these are pass-through functions not related to the API)
         
         void setTimeout(int timeout);
-        
-        
+
+        // (z)FEC/Fecpp Passthrough Functions
+        bool setFecDefaultSize(int k, int n);
+        int getFecK(){return m_fecK;}
+        int getFecN(){return m_fecN;}
+
     private:
         
         typedef std::vector<xmlrpc_c::value> Parameters;
@@ -373,6 +379,10 @@ namespace bmwrapper{
         std::string m_username;
         
         bool m_serverAvailable;
+
+        // FEC/Fecpp variables
+        int m_fecK;
+        int m_fecN;
         
         // If this is set, the class will ignore the status of the queue processing and force a shut down of the network.
         bool m_forceKill;

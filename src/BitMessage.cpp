@@ -4,7 +4,8 @@
 
 #include "BitMessage.h"
 #include <json/json.h>
-#include<boost/tokenizer.hpp>
+#include <fecpp.h>
+#include <boost/tokenizer.hpp>
 
 #include <string>
 #include <iostream>
@@ -57,8 +58,8 @@ namespace bmwrapper {
         
     }
     
-    
-    
+
+
     /*
      * Virtual Functions
      */
@@ -750,12 +751,7 @@ namespace bmwrapper {
     std::string BitMessage::getAddressFromLabel(std::string label){return "";}
     
     bool BitMessage::addContact(std::string label, std::string address){return false;}
-    
-    
-    // Binary Streaming Functions
-    
-    
-    
+
     
     /*
      * Message Queue Interaction
@@ -1824,10 +1820,24 @@ namespace bmwrapper {
         return BitDecodedAddress(decodedAddress.get("status", "").asString(), decodedAddress.get("addressVersion", "").asInt(), cleanRipe, decodedAddress.get("streamNumber", "").asInt());
         
     }
-    
-    
-    
-    
+
+
+    // FEC/Fecpp Passthrough Functions
+
+    bool BitMessage::setFecDefaultSize(int k, int n){
+
+        // Must conform to 1 <= K <= N <= 256
+        if( k <= 0 || n <= 0 || k > 256 || n > 256 || k > n ){
+            return false;
+        }
+        else{
+            m_fecK = k;
+            m_fecN = n;
+            return true;
+        }
+
+    }
+
     
     // Other API Commands
     
