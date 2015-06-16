@@ -17,6 +17,7 @@
 #include "base64.h"
 #include "sha256.h"
 #include "Network.h"
+#include "Filesystem.h"
 
 #include <fecpp.h>
 #include <string>
@@ -91,6 +92,8 @@ private:
     NetworkModule *m_owner;
 
     void zfec_encode(size_t k, size_t n, const std::string &prefix, std::ifstream &in);
+
+    FileSystemHandler fsHandler;
 
 };
 

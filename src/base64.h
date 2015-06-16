@@ -12,12 +12,12 @@ namespace bmwrapper {
         
     public:
         
-        base64(std::string msg="", bool packed=false){if(packed)m_data = msg;else{m_data = p_encode((const unsigned char *)msg.c_str(), msg.size());}}
-        
-        
+        base64(std::string msg="", bool packed=false) {if(packed)m_data = msg;else{m_data = p_encode((const unsigned char *)msg.c_str(), msg.size());}}
+        base64(unsigned char* msg) {m_data = p_encode(msg, sizeof(msg));}
+
         std::string encoded() const {return m_data;}
         std::string decoded() {return p_decode(m_data);}
-        
+        const unsigned char* decodeToChar(){return reinterpret_cast<const unsigned char *>(p_decode(m_data).c_str());}
         
         // Our Operator Overloads
         friend std::string& operator<< (std::string& left, base64& right){ left = right.p_decode(right.encoded()); return left;}
@@ -34,6 +34,7 @@ namespace bmwrapper {
         std::string p_decode(std::string const& s);
         
         std::string m_data;
+        bool m_isBinary;
         
     };
     

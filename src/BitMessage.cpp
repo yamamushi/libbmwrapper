@@ -573,8 +573,7 @@ namespace bmwrapper {
         if(message.getMessage().size() > 255 || message.isFile() ){
             // Messages beyond 256k will soon be disallowed over BitMessage as a spam filtering mechanism
             BmFEC fecEngine(this);
-            fecEngine.SendMail(message);
-            return false;
+            return fecEngine.SendMail(message);
         }
 
 

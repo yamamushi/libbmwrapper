@@ -3,7 +3,6 @@
 //
 
 #include "bmfec.h"
-#include "Filesystem.h"
 #include <fecpp.h>
 
 
@@ -103,7 +102,22 @@ void zfec_encode(size_t k, size_t n,
     zfec_encode(k, n, prefix, in, in_length);
 }
 
+
+// FIXME
 bool BmFEC::SendMail(NetworkMail message) {
+
+    if(message.isFile()){
+
+        if(fsHandler.FileExists(message.getMessage())){
+
+            return true;
+
+        }
+        else{
+            return false;
+        }
+
+    }
 
     return false;
 
