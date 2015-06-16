@@ -13,6 +13,7 @@
 #include "BitMessageQueue.h"
 
 
+
 namespace bmwrapper{
     
     
@@ -173,7 +174,7 @@ namespace bmwrapper{
     
     // Pre-defined here so we can hold one as an object in our BitMessage class.
     class BitMessageQueue;
-    
+
     class BitMessage : public NetworkModule {
         
     public:
@@ -340,7 +341,6 @@ namespace bmwrapper{
         
         
         // Other API Commands
-        
         int add(int x, int y);
         
         std::string getStatus(std::string ackData);
@@ -348,13 +348,8 @@ namespace bmwrapper{
         
         
         // Extra BitMessage Options (some of these are pass-through functions not related to the API)
-        
         void setTimeout(int timeout);
 
-        // (z)FEC/Fecpp Passthrough Functions
-        bool setFecDefaultSize(int k, int n);
-        int getFecK(){return m_fecK;}
-        int getFecN(){return m_fecN;}
 
     private:
         
@@ -381,8 +376,7 @@ namespace bmwrapper{
         bool m_serverAvailable;
 
         // FEC/Fecpp variables
-        int m_fecK;
-        int m_fecN;
+        //BmFEC *m_fecEngine;
         
         // If this is set, the class will ignore the status of the queue processing and force a shut down of the network.
         bool m_forceKill;

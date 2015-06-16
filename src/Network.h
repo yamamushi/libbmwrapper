@@ -72,7 +72,7 @@ class NetworkMail {
     
 public:
     
-    NetworkMail(std::string from="", std::string to="", std::string subject="", std::string message="", bool isRead=false, std::string messageID="", std::time_t received=0, std::time_t sent=0) : m_from(from), m_to(to), m_subject(subject), m_mail(message), m_readStatus(isRead), m_messageID(messageID), m_received(received), m_sent(sent) {}
+    NetworkMail(std::string from="", std::string to="", std::string subject="", std::string message="", bool isFile=false, bool isRead=false, std::string messageID="", std::time_t received=0, std::time_t sent=0) : m_from(from), m_to(to), m_subject(subject), m_mail(message), m_isFile(isFile), m_readStatus(isRead), m_messageID(messageID), m_received(received), m_sent(sent) {}
     
     std::string getFrom(){return m_from;}
     std::string getTo(){return m_to;}
@@ -81,7 +81,8 @@ public:
     std::time_t getReceivedTime(){return m_received;}
     std::time_t getSentTime(){return m_sent;}
     void        setRead(bool status){m_readStatus = status;}
-    bool        getRead(){ return m_readStatus;}
+    bool        getRead(){return m_readStatus;}
+    bool        isFile(){return m_isFile;}
     std::string getMessageID(){return m_messageID;}
     
 private:
@@ -90,9 +91,10 @@ private:
     std::string m_to;
     std::string m_subject;
     std::string m_mail;
-    
+
+    bool m_isFile;
     bool m_readStatus;
-    
+
     std::string m_messageID;
     
     std::time_t m_received;
@@ -157,8 +159,6 @@ public:
     virtual bool subscribeToAddress(std::string address, std::string label){return false;}
     
     // Functions for importing/exporting from BitMessage server addressbook
-    
-    
     virtual std::string getLabel(std::string address){return "";}
     virtual bool setLabel(std::string label, std::string address){return false;}
     virtual std::string getAddressFromLabel(std::string label){return "";}
@@ -175,7 +175,9 @@ public:
     virtual bool stopQueue(){return false;}
     virtual bool flushQueue(){return false;} // Forces a flush of the message queue.
     virtual int queueSize(){return 0;}
-    
+
+    // Functions for interfacing with BmFEC
+
     
 private:
     

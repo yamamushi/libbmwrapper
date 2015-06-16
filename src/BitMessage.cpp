@@ -3,8 +3,8 @@
 //
 
 #include "BitMessage.h"
+#include "bmfec.h"
 #include <json/json.h>
-#include <fecpp.h>
 #include <boost/tokenizer.hpp>
 
 #include <string>
@@ -26,7 +26,7 @@
 namespace bmwrapper {
     
     
-    BitMessage::BitMessage(std::string commstring) : NetworkModule(commstring, ModuleType::BITMESSAGE) {
+    BitMessage::BitMessage(std::string commstring) : NetworkModule(commstring, ModuleType::BITMESSAGE){
         
         // Pass our config string to be parsed locally
         parseCommstring(commstring);
@@ -567,6 +567,17 @@ namespace bmwrapper {
             checkAlive();
             return false;
         }
+
+
+        // FIXME
+        if(message.getMessage().size() > 255 || message.isFile() ){
+            // Messages beyond 256k will soon be disallowed over BitMessage as a spam filtering mechanism
+            BmFEC fecEngine(this);
+            fecEngine.SendMail(message);
+            return false;
+        }
+
+
         
         try{
             
@@ -875,11 +886,13 @@ namespace bmwrapper {
         for(unsigned int x=0; x<inbox.size(); x++){
             
             m_localUnformattedInbox.push_back(inbox.at(x));
-            
+
+            // FIXME
             _SharedPtr<NetworkMail> l_mail( new NetworkMail(inbox.at(x).getFromAddress(),
                                                             inbox.at(x).getToAddress(),
                                                             inbox.at(x).getSubject().decoded(),
                                                             inbox.at(x).getMessage().decoded(),
+                                                            false,
                                                             inbox.at(x).getRead(),
                                                             inbox.at(x).getMessageID(),
                                                             inbox.at(x).getReceivedTime())
@@ -1010,6 +1023,7 @@ namespace bmwrapper {
                                                             outbox.at(x).getToAddress(),
                                                             outbox.at(x).getSubject().decoded(),
                                                             outbox.at(x).getMessage().decoded(),
+                                                            false,
                                                             true,
                                                             outbox.at(x).getMessageID(),
                                                             0,
@@ -1819,23 +1833,6 @@ namespace bmwrapper {
         
         return BitDecodedAddress(decodedAddress.get("status", "").asString(), decodedAddress.get("addressVersion", "").asInt(), cleanRipe, decodedAddress.get("streamNumber", "").asInt());
         
-    }
-
-
-    // FEC/Fecpp Passthrough Functions
-
-    bool BitMessage::setFecDefaultSize(int k, int n){
-
-        // Must conform to 1 <= K <= N <= 256
-        if( k <= 0 || n <= 0 || k > 256 || n > 256 || k > n ){
-            return false;
-        }
-        else{
-            m_fecK = k;
-            m_fecN = n;
-            return true;
-        }
-
     }
 
     

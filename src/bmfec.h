@@ -1,3 +1,4 @@
+#pragma once
 /*
  Created by Jonathan Rumion on 6/12/15.
 
@@ -15,6 +16,7 @@
 
 #include "base64.h"
 #include "sha256.h"
+#include "Network.h"
 
 #include <fecpp.h>
 #include <string>
@@ -25,7 +27,7 @@
 
 namespace bmwrapper {
 
-size_t log2_ceil(size_t n) {
+inline size_t log2_ceil(size_t n) {
     size_t i = 0;
     while (n) {
         n >>= 1;
@@ -48,8 +50,6 @@ struct ZfecChunk {
     base64 m_data;
 
 };
-
-
 
 void write_zfec_header(std::ostream &output, size_t n, size_t k, size_t pad_bytes, size_t share_num);
 
@@ -77,15 +77,18 @@ private:
 };
 
 
-
-
 class BmFEC {
 
 public:
 
-    BmFEC(int k, int n){};
+    BmFEC(NetworkModule *owner) : m_owner(owner){};
+
+    bool SendMail(NetworkMail message);
+
 
 private:
+
+    NetworkModule *m_owner;
 
     void zfec_encode(size_t k, size_t n, const std::string &prefix, std::ifstream &in);
 

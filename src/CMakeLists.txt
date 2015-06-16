@@ -3,6 +3,7 @@ set(NAME bmwrapper)
 set(SRC
   BitMessage.cpp
   BitMessageQueue.cpp
+  Filesystem.cpp
   XmlRPC.cpp
   base64.cpp
   bmfec.cpp
@@ -34,6 +35,7 @@ target_link_libraries(${NAME}-static
   ${Boost_LIBRARIES}
   ${XMLRPC_LIBRARIES}
   jsoncpp
+  fecpp
   ${LIBBMWRAPPER_SYSTEM_LIBRARIES}
 )
 
@@ -47,9 +49,9 @@ install(FILES BMThreading.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrappe
 install(FILES TR1_Wrapper.hpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES XmlRPC.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 install(FILES bmfec.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
-# install(FILES sha256.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
+install(FILES Filesystem.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
+install(FILES sha256.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bmwrapper)
 
 
-
-INSTALL(TARGETS ${NAME}-static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
-INSTALL(TARGETS ${NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+INSTALL(TARGETS bmwrapper-static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+INSTALL(TARGETS bmwrapper LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

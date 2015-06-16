@@ -3,6 +3,9 @@
 //
 
 #include "bmfec.h"
+#include "Filesystem.h"
+#include <fecpp.h>
+
 
 namespace bmwrapper {
 
@@ -100,4 +103,30 @@ void zfec_encode(size_t k, size_t n,
     zfec_encode(k, n, prefix, in, in_length);
 }
 
+bool BmFEC::SendMail(NetworkMail message) {
+
+    return false;
+
 }
+
+}
+
+
+
+/*
+// FEC/Fecpp Passthrough Functions
+
+bool BitMessage::setFecDefaultSize(int k, int n){
+
+    // Must conform to 1 <= K <= N <= 256
+    if( k <= 0 || n <= 0 || k > 256 || n > 256 || k > n ){
+        return false;
+    }
+    else{
+        m_fecK = k;
+        m_fecN = n;
+        return true;
+    }
+
+}
+ */

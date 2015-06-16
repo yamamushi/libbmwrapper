@@ -75,7 +75,7 @@ endif()
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_COMPONENTS system random)
+set(Boost_COMPONENTS system random filesystem)
 find_package(Boost 1.53 REQUIRED ${Boost_COMPONENTS})
 find_package(OpenSSL REQUIRED)
 find_package(XMLRPC REQUIRED c++2 libwww-client)
