@@ -8,6 +8,8 @@ set(SRC
   base64.cpp
   bmfec.cpp
   sha256.cpp
+  cencode.c
+  cdecode.c
 )
 
 include_directories(SYSTEM

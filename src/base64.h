@@ -34,8 +34,7 @@ namespace bmwrapper {
         std::string p_decode(std::string const& s);
         
         std::string m_data;
-        bool m_isBinary;
-        
+
     };
     
 }

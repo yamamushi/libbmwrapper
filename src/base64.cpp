@@ -35,6 +35,9 @@
 
 
 #include "base64.h"
+#include "decode.h"
+#include "encode.h"
+
 
 namespace bmwrapper {
 
