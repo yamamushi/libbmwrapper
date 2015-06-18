@@ -4,6 +4,9 @@
 
 #include "bmfec.h"
 #include <fecpp.h>
+#include "decode.h"
+#include "encode.h"
+#include "base64.h"
 
 
 namespace bmwrapper {
@@ -108,7 +111,45 @@ bool BmFEC::SendMail(NetworkMail message) {
 
     if(message.isFile()){
 
-        if(fsHandler.FileExists(message.getMessage())){
+        // Resolve user paths ~
+        std::string l_filename = fsHandler.expand_user(message.getMessage());
+
+        if(fsHandler.FileExists(l_filename)){
+
+            // Attempt to load file
+            std::ifstream l_binaryFile(l_filename, std::ios::in|std::ios::binary);
+            if (l_binaryFile.is_open()) {
+
+                // Get length of file and store it in a char buffer
+                l_binaryFile.seekg(0, l_binaryFile.end);
+                unsigned long l_fileLength = (unsigned long)l_binaryFile.tellg(); // Will this limit our file sizes?
+                l_binaryFile.seekg(0, l_binaryFile.beg);
+
+                const char * l_binaryFileBuffer;
+                l_binaryFileBuffer = new char [l_fileLength];
+                l_binaryFile.read ((char*)l_binaryFileBuffer, l_fileLength);
+
+
+                // At this point our binary file has been loaded into l_binaryFileBuffer
+                // We need to convert it to base64 and package it for transport now
+                // We will use libb64 for encoding binaries
+
+                libb64::encoder l_encoder;
+                const char * l_base64encoderBuffer = new char [l_fileLength];
+                l_encoder.encode((char*)l_binaryFileBuffer, (int)l_fileLength, (char*)l_base64encoderBuffer);
+
+                // Now we package our buffer into a string, specifying the length
+                // Otherwise std::string will terminate at the first null character
+                std::string l_base64StringBuffer((char *)l_base64encoderBuffer, l_fileLength);
+
+                // Now we are done with the filestream, so we can close it
+                // And delete our buffers
+                delete l_base64encoderBuffer;
+                delete l_binaryFileBuffer;
+                l_binaryFile.close();
+
+            }
+
 
             return true;
 

@@ -12,7 +12,7 @@ For details, see http://sourceforge.net/projects/libb64
 
 #include <iostream>
 
-namespace base64
+namespace libb64
 {
 	extern "C"
 	{
