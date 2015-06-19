@@ -7,6 +7,7 @@
 #include "decode.h"
 #include "encode.h"
 #include "base64.h"
+#include "sha256.h"
 
 
 namespace bmwrapper {
@@ -106,6 +107,10 @@ void zfec_encode(size_t k, size_t n,
 }
 
 
+void BmFEC::zfec_encode(size_t k, size_t n, const std::string &prefix, std::ifstream &in) {
+
+}
+
 // FIXME
 bool BmFEC::SendMail(NetworkMail message) {
 
@@ -148,15 +153,46 @@ bool BmFEC::SendMail(NetworkMail message) {
                 delete l_binaryFileBuffer;
                 l_binaryFile.close();
 
+
+                // Package a new message and send it back through this loop for FEC magic
+                NetworkMail l_packagedMessage(message.getFrom(),
+                                              message.getTo(),
+                                              message.getSubject(),
+                                              l_base64StringBuffer);
+
+                return SendMail(l_packagedMessage);
+
             }
-
-
-            return true;
-
+            return false;
         }
         else{
             return false;
         }
+    }
+    else{
+        // Else our message is ready to be FEC'd
+
+        SHA256 l_sha256engine;
+        std::string l_sha256sum = l_sha256engine(message.getMessage());
+
+        // Create class to store disassembled message contents into a Vector
+        // 
+        // Disassemble our message and pass into Vector class
+        //
+        // void encode(const byte input[], size_t size,
+        // std::tr1::function<void (size_t, size_t, const byte[], size_t)> out) const
+        //
+        // The tr1::function above will be a function within our vector class
+        // That indexes and stores the relevant message information
+        //
+        // Once Vector is assembled, we will parse through it to send each
+        // message chunk piece by piece.
+        //
+
+
+            // Package
+
+
 
     }
 
