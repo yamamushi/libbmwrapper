@@ -158,7 +158,7 @@ bool BmFEC::SendMail(NetworkMail message) {
                 NetworkMail l_packagedMessage(message.getFrom(),
                                               message.getTo(),
                                               message.getSubject(),
-                                              l_base64StringBuffer);
+                                              l_base64StringBuffer.c_str());
 
                 return SendMail(l_packagedMessage);
 
@@ -175,22 +175,39 @@ bool BmFEC::SendMail(NetworkMail message) {
         SHA256 l_sha256engine;
         std::string l_sha256sum = l_sha256engine(message.getMessage());
 
-        // Create class to store disassembled message contents into a Vector
-        // 
-        // Disassemble our message and pass into Vector class
+        // Init class to store disassembled message contents into a Vector
+        bmfec_message l_bmfecCollection(1); // Temporary
+
+        // Init an fec_code object to do the hard work for us
+        fecpp::fec_code l_fecEngine(1,1); // Temporary
+
+        // Disassemble our message and pass into Vector container class
         //
         // void encode(const byte input[], size_t size,
         // std::tr1::function<void (size_t, size_t, const byte[], size_t)> out) const
         //
-        // The tr1::function above will be a function within our vector class
-        // That indexes and stores the relevant message information
+        // It's important to note that message.getMessage() at this point should be a
+        // base64 encoded string, it should not contain null data, but we encoded it
+        // again anyways to account for plaintext messages that may come through here
+        // being too large on their own.
         //
-        // Once Vector is assembled, we will parse through it to send each
+        l_fecEngine.encode(reinterpret_cast<const unsigned char*>(base64(message.getMessage()).encoded().c_str()),
+                           message.getMessage().size(),
+                           std::ref(l_bmfecCollection));
+        // The std::ref/tr1::function above is the () operator function within our vector class (bmfec_message)
+        // That indexes and stores the message information.
+        //
+        // Once bmfec_message is assembled, we will parse through it to send each
         // message chunk piece by piece.
         //
+        // In order for our message to be indexed properly, we now need assemble a header for each piece in
+        // the bmfec_message class vector.
+        //
 
 
-            // Package
+
+
+        // Package
 
 
 

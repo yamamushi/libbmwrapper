@@ -21,6 +21,7 @@
 
 #include <fecpp.h>
 #include <string>
+#include <vector>
 #include <fstream>
 #include <sstream>
 
@@ -43,12 +44,25 @@ inline fecpp::byte get_byte(size_t byte_num, T input) {
 }
 
 
-struct ZfecChunk {
+struct bmfec_message {
+
+public:
+
+    bmfec_message(size_t n) : m_messageCollection(n) {}
+
+    void operator()(size_t i, size_t, const unsigned char fec[], size_t fec_len)
+    {
+        m_messageCollection[i].append(reinterpret_cast<const char*>(fec), fec_len);
+    }
+
+    std::string getSha256(){return m_sha256sum;}
+    std::vector<std::string> getMessageCollection(){return m_messageCollection;}
+
+private:
+
 
     std::string m_sha256sum;
-    int m_K;
-    int m_N;
-    base64 m_data;
+    std::vector<std::string> m_messageCollection;
 
 };
 
