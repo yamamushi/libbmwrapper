@@ -4,6 +4,7 @@
 
 #include "bmfec.h"
 #include <fecpp.h>
+#include<boost/tokenizer.hpp>
 #include "decode.h"
 #include "encode.h"
 #include "base64.h"
@@ -12,104 +13,6 @@
 
 namespace bmwrapper {
 
-void write_zfec_header(std::ostream &output,
-                       size_t n, size_t k, size_t pad_bytes, size_t share_num) {
-    // What a waste of effort to save, at best, 2 bytes. Blech.
-    const size_t nbits = log2_ceil(n - 1);
-    const size_t kbits = log2_ceil(k - 1);
-
-    size_t out = (n - 1);
-    out <<= nbits;
-    out |= (k - 1);
-    out <<= kbits;
-    out |= pad_bytes;
-    out <<= nbits;
-    out |= share_num;
-
-    size_t bitsused = 8 + kbits + nbits * 2;
-
-    if (bitsused <= 16)
-        out <<= (16 - bitsused);
-    else if (bitsused <= 24)
-        out <<= (24 - bitsused);
-    else if (bitsused <= 32)
-        out <<= (32 - bitsused);
-
-    for (size_t i = 0; i != (bitsused + 7) / 8; ++i) {
-        unsigned char b = get_byte(i + (sizeof(size_t) - (bitsused + 7) / 8), out);
-        output.write((char *) &b, 1);
-    }
-}
-
-
-// This will be replaced by a bitmessage transfer utility class
-
-zfec_file_writer::zfec_file_writer(const std::string &prefix, size_t n, size_t k, size_t pad_bytes) {
-    for (size_t i = 0; i != n; ++i) {
-        std::ostringstream outname;
-        outname << prefix << '.';
-
-        if (n > 10 && i < 10)
-            outname << '0';
-        if (n > 100 && i < 100)
-            outname << '0';
-
-        outname << i << '_' << n << ".fec";
-
-        std::ofstream *out = new std::ofstream(outname.str().c_str());
-
-        if (!*out)
-            throw std::runtime_error("Failed to write " + outname.str());
-
-        write_zfec_header(*out, n, k, pad_bytes, i);
-        outputs.push_back(out);
-    }
-}
-
-
-void zfec_encode(size_t k, size_t n,
-                 const std::string &prefix,
-                 std::istream &in,
-                 size_t in_len) {
-    const size_t chunksize = 4096;
-
-    fecpp::fec_code fec(k, n);
-
-    std::vector<fecpp::byte> buf(chunksize * k);
-
-    size_t pad_bytes = (in_len % k == 0) ? 0 : k - (in_len % k);
-
-    zfec_file_writer file_writer(prefix, n, k, pad_bytes);
-
-    while (in.good()) {
-        in.read((char *) &buf[0], buf.size());
-        size_t got = in.gcount();
-
-        if (got == buf.size())
-            fec.encode(&buf[0], buf.size(), std::ref(file_writer));
-        else {
-            // Handle final block by padding up to k bytes with 0s
-            for (size_t i = 0; i != pad_bytes; ++i)
-                buf[i + got] = 0;
-            fec.encode(&buf[0], got + pad_bytes, std::ref(file_writer));
-        }
-    }
-}
-
-void zfec_encode(size_t k, size_t n,
-                 const std::string &prefix,
-                 std::ifstream &in) {
-    in.seekg(0, std::ios::end);
-    size_t in_length = in.tellg();
-    in.seekg(0, std::ios::beg);
-
-    zfec_encode(k, n, prefix, in, in_length);
-}
-
-
-void BmFEC::zfec_encode(size_t k, size_t n, const std::string &prefix, std::ifstream &in) {
-
-}
 
 // FIXME
 bool BmFEC::SendMail(NetworkMail message) {
@@ -172,14 +75,33 @@ bool BmFEC::SendMail(NetworkMail message) {
     else{
         // Else our message is ready to be FEC'd
 
+        int l_maxSize = 200; // To account for room for our header
+        int l_messageSize = message.getMessage().size();
+
+        if(l_messageSize < l_maxSize){
+            return m_owner->sendMail(message);
+        }
+
+        int fec_k, fec_n;
+
+        // Divide & Round Up
+        fec_n = l_messageSize / l_maxSize + (((l_messageSize < 0) ^ (l_maxSize > 0)) && (l_messageSize%l_maxSize));
+
+        // We are defaulting to 1/3rd of the split pieces necessary for reconstruction
+        fec_k = fec_n / 3 + (((fec_n < 0) ^ (3 > 0)) && (fec_n%3));
+
+
+        // Init an fec_code object to do the hard work for us
+        fecpp::fec_code l_fecEngine(fec_k,fec_n);
+
+        // Init class to store disassembled message contents into a Vector
+        bmfec_message l_bmfecCollection(fec_n);
+
+
+        // Grab the sha256 sum of our message
         SHA256 l_sha256engine;
         std::string l_sha256sum = l_sha256engine(message.getMessage());
 
-        // Init class to store disassembled message contents into a Vector
-        bmfec_message l_bmfecCollection(1); // Temporary
-
-        // Init an fec_code object to do the hard work for us
-        fecpp::fec_code l_fecEngine(1,1); // Temporary
 
         // Disassemble our message and pass into Vector container class
         //
@@ -196,18 +118,52 @@ bool BmFEC::SendMail(NetworkMail message) {
                            std::ref(l_bmfecCollection));
         // The std::ref/tr1::function above is the () operator function within our vector class (bmfec_message)
         // That indexes and stores the message information.
-        //
+
+
         // Once bmfec_message is assembled, we will parse through it to send each
         // message chunk piece by piece.
         //
-        // In order for our message to be indexed properly, we now need assemble a header for each piece in
-        // the bmfec_message class vector.
+        // In order for our message to be indexed properly, we need assemble a header for each piece in
+        // bmfec_message's container vector.
         //
+        for(unsigned int i = 0; i < l_bmfecCollection.getMessageCollection().size(); i++){
+
+            std::string l_part("Part: " + std::to_string(i) + "\n");
+            std::string l_of("Of: " + std::to_string(l_bmfecCollection.getMessageCollection().size()) + "\n");
+            std::string l_sha("sha256: " + l_sha256sum + "\n");
+            std::string l_begin("--BEGIN DATA--\n");
+            std::string l_content(l_bmfecCollection.getMessageCollection().at(i));
+            std::string l_end("--END DATA--\n");
+
+            // Wrap up the Message
+            std::string l_messageContent(l_part + l_of + l_sha + l_begin + l_content + l_end);
+
+            // If our message is still too large, we need to recurse through this function again
+            // Until we are left with an appropriate message size
+            if((int)l_messageContent.size() > l_maxSize){
+                NetworkMail l_needsRecursivePackingMessage(message.getFrom(),
+                                              message.getTo(),
+                                              message.getSubject(),
+                                              l_messageContent.c_str());
+
+                return SendMail(l_needsRecursivePackingMessage);
+            }
+            else{
+                // Take our final packed message and send it through our owner
+
+                NetworkMail l_outboundMessage(message.getFrom(),
+                                              message.getTo(),
+                                              message.getSubject(),
+                                              l_messageContent.c_str());
+
+                return m_owner->sendMail(l_outboundMessage);
+            }
+
+        }
 
 
 
 
-        // Package
 
 
 
