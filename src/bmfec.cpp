@@ -20,50 +20,50 @@ bool BmFEC::SendMail(NetworkMail message) {
     if(message.isFile()){
 
         // Resolve user paths ~
+        FileSystemHandler fsHandler;
+
         std::string l_filename = fsHandler.expand_user(message.getMessage());
 
         if(fsHandler.FileExists(l_filename)){
 
             // Attempt to load file
-            std::ifstream l_binaryFile(l_filename, std::ios::in|std::ios::binary);
+            std::ifstream l_binaryFile(l_filename, std::ios::binary);
             if (l_binaryFile.is_open()) {
 
                 // Get length of file and store it in a char buffer
                 l_binaryFile.seekg(0, l_binaryFile.end);
-                unsigned long l_fileLength = (unsigned long)l_binaryFile.tellg(); // Will this limit our file sizes?
+                size_t l_fileLength = l_binaryFile.tellg();
                 l_binaryFile.seekg(0, l_binaryFile.beg);
 
-                const char * l_binaryFileBuffer;
-                l_binaryFileBuffer = new char [l_fileLength];
+                const char * l_binaryFileBuffer = new char [l_fileLength];
                 l_binaryFile.read ((char*)l_binaryFileBuffer, l_fileLength);
 
 
                 // At this point our binary file has been loaded into l_binaryFileBuffer
                 // We need to convert it to base64 and package it for transport now
                 // We will use libb64 for encoding binaries
-
-                libb64::encoder l_encoder;
+                libb64::encoder * l_encoder = new libb64::encoder;
                 const char * l_base64encoderBuffer = new char [l_fileLength];
-                l_encoder.encode((char*)l_binaryFileBuffer, (int)l_fileLength, (char*)l_base64encoderBuffer);
+                l_encoder->encode((char*)l_binaryFileBuffer, l_fileLength, (char*)l_base64encoderBuffer);
 
-                // Now we package our buffer into a string, specifying the length
+                // Now we package our buffer into a string, specfying the length
                 // Otherwise std::string will terminate at the first null character
                 std::string l_base64StringBuffer((char *)l_base64encoderBuffer, l_fileLength);
+                //std::string l_base64StringBuffer(std::to_string(sizeof(l_binaryFileBuffer)) + " " + std::to_string(sizeof(l_base64encoderBuffer)));
 
                 // Now we are done with the filestream, so we can close it
                 // And delete our buffers
-                delete l_base64encoderBuffer;
-                delete l_binaryFileBuffer;
+                delete[] l_base64encoderBuffer;
+                delete[] l_binaryFileBuffer;
                 l_binaryFile.close();
-
 
                 // Package a new message and send it back through this loop for FEC magic
                 NetworkMail l_packagedMessage(message.getFrom(),
                                               message.getTo(),
                                               message.getSubject(),
-                                              l_base64StringBuffer.c_str());
+                                              l_base64StringBuffer.data());
 
-                return SendMail(l_packagedMessage);
+                return m_owner->sendMail(l_packagedMessage);
 
             }
             return false;
@@ -75,28 +75,40 @@ bool BmFEC::SendMail(NetworkMail message) {
     else{
         // Else our message is ready to be FEC'd
 
-        int l_maxSize = 200; // To account for room for our header
+        int l_maxSize = 255; // To account for room for our header
         int l_messageSize = message.getMessage().size();
 
         if(l_messageSize < l_maxSize){
             return m_owner->sendMail(message);
         }
 
-        int fec_k, fec_n;
+        int fec_k = 0;
+        int fec_n = 0;
+
+
 
         // Divide & Round Up
-        fec_n = l_messageSize / l_maxSize + (((l_messageSize < 0) ^ (l_maxSize > 0)) && (l_messageSize%l_maxSize));
+        //fec_n = l_messageSize / l_maxSize + (((l_messageSize < 0) ^ (l_maxSize > 0)) && (l_messageSize%l_maxSize));
+        fec_n = 20;
+
+        for(int x = fec_n-1; x >= 1; x--){
+
+            if(l_messageSize % x == 0){
+                fec_k = x;
+                break;
+            }
+
+        }
 
         // We are defaulting to 1/3rd of the split pieces necessary for reconstruction
-        fec_k = fec_n / 3 + (((fec_n < 0) ^ (3 > 0)) && (fec_n%3));
+        //fec_k = fec_n / 3 + (((fec_n < 0) ^ (3 > 0)) && (fec_n%3));
 
 
         // Init an fec_code object to do the hard work for us
         fecpp::fec_code l_fecEngine(fec_k,fec_n);
 
         // Init class to store disassembled message contents into a Vector
-        bmfec_message l_bmfecCollection(fec_n);
-
+        bmfec_message l_bmfecCollection(l_fecEngine.get_N());
 
         // Grab the sha256 sum of our message
         SHA256 l_sha256engine;
@@ -128,36 +140,26 @@ bool BmFEC::SendMail(NetworkMail message) {
         //
         for(unsigned int i = 0; i < l_bmfecCollection.getMessageCollection().size(); i++){
 
-            std::string l_part("Part: " + std::to_string(i) + "\n");
-            std::string l_of("Of: " + std::to_string(l_bmfecCollection.getMessageCollection().size()) + "\n");
+            //std::string l_part("Part: " + std::to_string(i) + "\n");
+            //std::string l_of("Of: " + std::to_string(l_bmfecCollection.getMessageCollection().size()) + "\n");
             std::string l_sha("sha256: " + l_sha256sum + "\n");
-            std::string l_begin("--BEGIN DATA--\n");
+            //std::string l_begin("--BEGIN DATA--\n");
             std::string l_content(l_bmfecCollection.getMessageCollection().at(i));
-            std::string l_end("--END DATA--\n");
+            //std::string l_end("\n--END DATA--\n");
 
             // Wrap up the Message
-            std::string l_messageContent(l_part + l_of + l_sha + l_begin + l_content + l_end);
+            //std::string l_messageContent(l_part + l_of + l_sha + l_begin + l_content + l_end);
+            std::string l_messageContent(l_sha+l_content);
 
-            // If our message is still too large, we need to recurse through this function again
-            // Until we are left with an appropriate message size
-            if((int)l_messageContent.size() > l_maxSize){
-                NetworkMail l_needsRecursivePackingMessage(message.getFrom(),
-                                              message.getTo(),
-                                              message.getSubject(),
-                                              l_messageContent.c_str());
-
-                return SendMail(l_needsRecursivePackingMessage);
-            }
-            else{
                 // Take our final packed message and send it through our owner
 
-                NetworkMail l_outboundMessage(message.getFrom(),
-                                              message.getTo(),
-                                              message.getSubject(),
-                                              l_messageContent.c_str());
+            NetworkMail l_outboundMessage(message.getFrom(),
+                                          message.getTo(),
+                                          message.getSubject(),
+                                          l_messageContent.data());
 
-                return m_owner->sendMail(l_outboundMessage);
-            }
+            m_owner->sendMail(l_outboundMessage);
+
 
         }
 

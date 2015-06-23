@@ -29,6 +29,7 @@ target_link_libraries(${NAME}
   jsoncpp
   fecpp
   ${LIBBMWRAPPER_SYSTEM_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
 )
 
 add_library(${NAME}-static STATIC ${SRC})
@@ -39,6 +40,7 @@ target_link_libraries(${NAME}-static
   jsoncpp
   fecpp
   ${LIBBMWRAPPER_SYSTEM_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
 )
 
 set_target_properties(${NAME}-static PROPERTIES OUTPUT_NAME ${NAME})

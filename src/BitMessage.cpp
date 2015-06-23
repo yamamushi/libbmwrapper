@@ -568,16 +568,20 @@ namespace bmwrapper {
             return false;
         }
 
-
-        // FIXME
+        /*
+         * This is commented out to bypass the size check of messages
+         * It has not been lowered within the PyBitmessage client, and therefore
+         * Is disabled here temporarily until such time that it needs
+         * To be enabled.
+         */
+        /*
         if(message.getMessage().size() > 255 || message.isFile() ){
             // Messages beyond 256k will soon be disallowed over BitMessage as a spam filtering mechanism
             BmFEC fecEngine(this);
             return fecEngine.SendMail(message);
         }
+         */
 
-
-        
         try{
             
             OT_STD_FUNCTION(void()) command = OT_STD_BIND(&BitMessage::sendMessage, this, message.getTo(), message.getFrom(), base64(message.getSubject()), base64(message.getMessage()), 2);

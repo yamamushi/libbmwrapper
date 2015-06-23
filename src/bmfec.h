@@ -26,7 +26,6 @@
 #include <sstream>
 
 
-
 namespace bmwrapper {
 
 
@@ -53,6 +52,7 @@ private:
 
 
 
+
 class BmFEC {
 
 public:
@@ -65,11 +65,12 @@ public:
 private:
 
     NetworkModule *m_owner;
-    FileSystemHandler fsHandler;
 
 };
 
 }
+
+
 
 
 #endif //LIBBMWRAPPER_BMFEC_H
